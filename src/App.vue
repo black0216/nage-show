@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterView, RouterLink } from 'vue-router'
+import BackToTop from './components/BackToTop.vue'
 </script>
 
 <template>
@@ -17,6 +18,9 @@ import { RouterView, RouterLink } from 'vue-router'
     <main class="main-content">
       <RouterView />
     </main>
+
+    <!-- Global Back to Top Button -->
+    <BackToTop />
   </div>
 </template>
 
@@ -28,9 +32,10 @@ import { RouterView, RouterLink } from 'vue-router'
 }
 
 .header {
-  background-color: #2c3e50;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid #444;
 }
 
 .nav {
@@ -42,22 +47,26 @@ import { RouterView, RouterLink } from 'vue-router'
 }
 
 .nav-link {
-  color: #ecf0f1;
+  color: #ccc;
   text-decoration: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: all 0.3s ease;
   font-weight: 500;
+  border: 1px solid transparent;
 }
 
 .nav-link:hover {
-  background-color: #34495e;
-  color: #3498db;
+  background-color: #333;
+  color: #ffd700;
+  border-color: #444;
 }
 
 .nav-link.active {
-  background-color: #3498db;
-  color: white;
+  background: linear-gradient(135deg, #444 0%, #333 100%);
+  color: #ffd700;
+  border-color: #666;
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.2);
 }
 
 .main-content {
@@ -69,5 +78,9 @@ import { RouterView, RouterLink } from 'vue-router'
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  background: rgba(26, 26, 26, 0.3);
+  border-radius: 8px;
+  margin: 1rem auto;
+  backdrop-filter: blur(5px);
 }
 </style>

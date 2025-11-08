@@ -22,6 +22,7 @@ let allDropsData: DropData[] = []
 const drops = ref<DropData[]>([])
 const searchTerm = ref('')
 const hoveredItem = ref<DropItem | null>(null) // Current hovered item
+const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
 
 // Pagination and loading states
 const ITEMS_PER_PAGE = 20
@@ -29,8 +30,6 @@ const currentPage = ref(1)
 const isLoading = ref(false)
 const hasMore = ref(true)
 
-// Back to top button state
-const showBackToTop = ref(false)
 
 // Load all data for search functionality
 const loadAllData = async () => {
@@ -147,27 +146,30 @@ const getItemTypeText = (type: number): string => {
   }
 }
 
+// Get unique identifier for an item
+const getItemId = (item: DropItem, dropIndex?: number, itemIndex?: number): string => {
+  // 如果没有提供索引信息，使用道具属性作为基础标识符
+  const baseId = `${item.Name}_${item.Sheet}_${item.X}_${item.Y}_${item.Type}`
+
+  // 如果提供了索引信息，添加位置信息确保唯一性
+  if (dropIndex !== undefined && itemIndex !== undefined) {
+    return `${baseId}_${dropIndex}_${itemIndex}`
+  }
+
+  return baseId
+}
+
 // Handle item hover
-const handleItemHover = (item: DropItem, isHovering: boolean) => {
+const handleItemHover = (item: DropItem, dropIndex: number, itemIndex: number, isHovering: boolean) => {
   if (isHovering) {
     hoveredItem.value = item
+    hoveredItemId.value = getItemId(item, dropIndex, itemIndex)
   } else {
     hoveredItem.value = null
+    hoveredItemId.value = ''
   }
 }
 
-// Back to top functionality
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  })
-}
-
-// Handle scroll events to show/hide back to top button
-const handleScroll = () => {
-  showBackToTop.value = window.scrollY > 300
-}
 
 // Initialize component
 onMounted(async () => {
@@ -180,9 +182,7 @@ onMounted(async () => {
   // Setup intersection observer for infinite scroll
   setupInfiniteScroll()
 
-  // Add scroll event listener
-  window.addEventListener('scroll', handleScroll)
-})
+  })
 
 // Setup infinite scroll
 let infiniteObserver: IntersectionObserver | null = null
@@ -210,8 +210,6 @@ const setupInfiniteScroll = () => {
     if (infiniteObserver) {
       infiniteObserver.disconnect()
     }
-    // Remove scroll event listener
-    window.removeEventListener('scroll', handleScroll)
   })
 }
 
@@ -283,14 +281,14 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
         <div class="items-grid">
           <div
             v-for="(item, itemIndex) in drop.DropItems"
-            :key="itemIndex"
+            :key="getItemId(item, dropIndex, itemIndex)"
             class="item-container"
             :class="{ 'equipment': item.Type === 3, 'gift': item.Type === 2 }"
           >
             <div
               class="item-wrapper"
-              @mouseenter="handleItemHover(item, true)"
-              @mouseleave="handleItemHover(item, false)"
+              @mouseenter="handleItemHover(item, dropIndex, itemIndex, true)"
+              @mouseleave="handleItemHover(item, dropIndex, itemIndex, false)"
             >
               <div
                 class="item-icon"
@@ -304,7 +302,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <!-- Item Tooltip Component -->
             <ItemTooltip
               :item="hoveredItem"
-              :visible="hoveredItem === item"
+              :visible="hoveredItemId === getItemId(item, dropIndex, itemIndex)"
             />
           </div>
         </div>
@@ -331,19 +329,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
       </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button
-      v-if="showBackToTop"
-      @click="scrollToTop"
-      class="back-to-top"
-      title="返回顶部"
-      aria-label="返回顶部"
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-  </div>
+    </div>
 </template>
 
 <style scoped>
@@ -713,84 +699,6 @@ h1 {
   margin: 5px 0;
 }
 
-/* Back to Top Button */
-.back-to-top {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-  transition: all 0.3s ease;
-  z-index: 1000;
-  color: #1a1a1a;
-}
-
-.back-to-top:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
-  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
-}
-
-.back-to-top:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-}
-
-.back-to-top svg {
-  transition: transform 0.3s ease;
-}
-
-.back-to-top:hover svg {
-  transform: translateY(-2px);
-}
-
-/* Animation for button appearance */
-.back-to-top {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Mobile optimization for back to top button */
-@media (max-width: 768px) {
-  .back-to-top {
-    bottom: 20px;
-    right: 20px;
-    width: 45px;
-    height: 45px;
-  }
-}
-
-@media (max-width: 480px) {
-  .back-to-top {
-    bottom: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
-  }
-
-  .back-to-top svg {
-    width: 20px;
-    height: 20px;
-  }
-}
 
 /* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {

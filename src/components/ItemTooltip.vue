@@ -27,17 +27,29 @@
 
 <script setup lang="ts">
 
-interface DropItem {
+// Unified interface for different item types
+interface BaseItem {
   Name: string
-  Sheet: string
   Type: number // 1: 普通, 2: 礼包, 3: 装备
-  X: number
-  Y: number
   Gifts?: string[]
 }
 
+interface DropItem extends BaseItem {
+  Sheet: string
+  X: number
+  Y: number
+}
+
+interface CraftingItem extends BaseItem {
+  Sheet: string
+  X: number
+  Y: number
+}
+
+type ItemData = DropItem | CraftingItem
+
 interface Props {
-  item: DropItem | null
+  item: ItemData | null
   visible: boolean
 }
 
@@ -60,7 +72,7 @@ const getItemTypeText = (type: number): string => {
 <style scoped>
 .item-tooltip {
   position: absolute;
-  bottom: 60px;
+  bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #333 0%, #222 100%);
@@ -71,6 +83,7 @@ const getItemTypeText = (type: number): string => {
   z-index: 1000;
   box-shadow: 0 6px 12px rgba(0,0,0,0.7);
   pointer-events: none;
+  white-space: nowrap;
 }
 
 .item-tooltip::after {
