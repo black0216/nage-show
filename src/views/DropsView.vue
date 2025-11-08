@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import ItemTooltip from '../components/ItemTooltip.vue'
 
 interface DropItem {
   Name: string
@@ -20,7 +21,7 @@ let allDropsData: DropData[] = []
 
 const drops = ref<DropData[]>([])
 const searchTerm = ref('')
-const hoveredItem = ref<DropItem | null>(null)
+const hoveredItem = ref<DropItem | null>(null) // Current hovered item
 
 // Pagination and loading states
 const ITEMS_PER_PAGE = 20
@@ -146,6 +147,15 @@ const getItemTypeText = (type: number): string => {
   }
 }
 
+// Handle item hover
+const handleItemHover = (item: DropItem, isHovering: boolean) => {
+  if (isHovering) {
+    hoveredItem.value = item
+  } else {
+    hoveredItem.value = null
+  }
+}
+
 // Back to top functionality
 const scrollToTop = () => {
   window.scrollTo({
@@ -264,8 +274,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 
     <div class="drops-container">
       <div
-        v-for="(drop, index) in filteredDrops"
-        :key="index"
+        v-for="(drop, dropIndex) in filteredDrops"
+        :key="`${drop.NpcName}_${dropIndex}`"
         class="drop-item"
       >
         <div class="monster-name">{{ drop.NpcName }}</div>
@@ -279,8 +289,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
           >
             <div
               class="item-wrapper"
-              @mouseenter="hoveredItem = item"
-              @mouseleave="hoveredItem = null"
+              @mouseenter="handleItemHover(item, true)"
+              @mouseleave="handleItemHover(item, false)"
             >
               <div
                 class="item-icon"
@@ -291,31 +301,11 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <div class="item-name-label">{{ item.Name }}</div>
             </div>
 
-            <!-- Hover tooltip -->
-            <div
-              v-if="hoveredItem === item"
-              class="tooltip"
-              :class="{ 'gift-tooltip': item.Type === 2 }"
-            >
-              <div class="tooltip-header">
-                <span class="item-name">{{ item.Name }}</span>
-                <span class="item-type">{{ getItemTypeText(item.Type) }}</span>
-              </div>
-
-              <!-- Gift contents -->
-              <div v-if="item.Type === 2 && item.Gifts && item.Gifts.length > 0" class="gift-contents">
-                <div class="gift-title">礼包内容：</div>
-                <div class="gift-items">
-                  <div
-                    v-for="(gift, giftIndex) in item.Gifts"
-                    :key="giftIndex"
-                    class="gift-item"
-                  >
-                    <span class="gift-item-name">{{ gift }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <!-- Item Tooltip Component -->
+            <ItemTooltip
+              :item="hoveredItem"
+              :visible="hoveredItem === item"
+            />
           </div>
         </div>
       </div>
@@ -664,85 +654,6 @@ h1 {
 }
 
 .gift .item-name-label {
-  color: #4ecdc4;
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #333 0%, #222 100%);
-  border: 2px solid #555;
-  border-radius: 6px;
-  padding: 10px;
-  min-width: 180px;
-  z-index: 1000;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-  pointer-events: none;
-}
-
-.tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: #555;
-}
-
-.tooltip-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #444;
-  padding-bottom: 6px;
-}
-
-.item-name {
-  font-weight: bold;
-  color: #ffd700;
-  font-size: 14px;
-}
-
-.item-type {
-  background-color: #555;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-
-.gift-contents {
-  margin-top: 8px;
-}
-
-.gift-title {
-  font-weight: bold;
-  color: #4ecdc4;
-  margin-bottom: 6px;
-  font-size: 13px;
-}
-
-.gift-items {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.gift-item-name {
-  color: #ccc;
-  font-size: 12px;
-  padding-left: 10px;
-  position: relative;
-}
-
-.gift-item-name::before {
-  content: '•';
-  position: absolute;
-  left: 2px;
   color: #4ecdc4;
 }
 
