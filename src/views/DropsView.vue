@@ -28,6 +28,22 @@ const currentPage = ref(1)
 const isLoading = ref(false)
 const hasMore = ref(true)
 
+// Back to top button state
+const showBackToTop = ref(false)
+
+// Load all data for search functionality
+const loadAllData = async () => {
+  if (allDropsData.length > 0) return // Already loaded
+
+  try {
+    const response = await fetch('/Drops.json')
+    const allData = await response.json()
+    allDropsData = allData
+  } catch (error) {
+    console.error('Failed to load all drops data:', error)
+  }
+}
+
 // Load drops data with pagination
 const loadMoreDrops = async (reset = false) => {
   if (isLoading.value) return
@@ -37,16 +53,13 @@ const loadMoreDrops = async (reset = false) => {
   try {
     // If loading for the first time or resetting, load all data
     if (reset || drops.value.length === 0) {
-      const response = await fetch('/Drops.json')
-      const allData = await response.json()
+      // Ensure all data is loaded first
+      await loadAllData()
 
       // Reset state
       drops.value = []
       currentPage.value = 1
       hasMore.value = true
-
-      // Store all data for pagination
-      allDropsData = allData
     }
 
     // Get current page of data
@@ -76,7 +89,8 @@ const loadMoreDrops = async (reset = false) => {
 const filteredDrops = computed(() => {
   if (!searchTerm.value) return drops.value
 
-  return drops.value.filter(drop =>
+  // Search from all data instead of just loaded data
+  return allDropsData.filter(drop =>
     drop.NpcName.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
@@ -86,13 +100,18 @@ let searchTimeout: number
 const handleSearch = (term: string) => {
   clearTimeout(searchTimeout)
 
-  searchTimeout = setTimeout(() => {
+  searchTimeout = setTimeout(async () => {
     if (term) {
-      // If searching, load all data and filter
-      loadMoreDrops(true)
+      // If searching, ensure all data is loaded for complete search
+      if (allDropsData.length === 0) {
+        await loadMoreDrops(true)
+      }
     } else {
-      // If search cleared, reset to pagination
-      loadMoreDrops(true)
+      // If search cleared, reset to pagination and ensure observer works
+      await loadMoreDrops(true)
+      // Force update observer after DOM is updated
+      await nextTick()
+      updateObserverTarget()
     }
   }, 300)
 }
@@ -127,12 +146,32 @@ const getItemTypeText = (type: number): string => {
   }
 }
 
+// Back to top functionality
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
+// Handle scroll events to show/hide back to top button
+const handleScroll = () => {
+  showBackToTop.value = window.scrollY > 300
+}
+
 // Initialize component
-onMounted(() => {
+onMounted(async () => {
+  // Load all data on mount to enable complete search functionality
+  await loadAllData()
+
+  // Load initial page for display
   loadMoreDrops(true)
 
   // Setup intersection observer for infinite scroll
   setupInfiniteScroll()
+
+  // Add scroll event listener
+  window.addEventListener('scroll', handleScroll)
 })
 
 // Setup infinite scroll
@@ -161,6 +200,8 @@ const setupInfiniteScroll = () => {
     if (infiniteObserver) {
       infiniteObserver.disconnect()
     }
+    // Remove scroll event listener
+    window.removeEventListener('scroll', handleScroll)
   })
 }
 
@@ -174,23 +215,36 @@ const updateObserverTarget = () => {
   nextTick(() => {
     if (!infiniteObserver) return
 
-    // Observe the infinite scroll trigger
-    const trigger = document.querySelector('.infinite-scroll-trigger')
-    if (trigger) {
-      infiniteObserver.observe(trigger)
-    }
+    // Only set up infinite scroll when not searching and there's more data to load
+    if (!searchTerm.value && hasMore.value) {
+      // Observe the infinite scroll trigger
+      const trigger = document.querySelector('.infinite-scroll-trigger')
+      if (trigger) {
+        infiniteObserver.observe(trigger)
+      }
 
-    // Also observe the last drop item as backup
-    const lastItem = document.querySelector('.drop-item:last-child')
-    if (lastItem) {
-      infiniteObserver.observe(lastItem)
+      // Also observe the last drop item as backup
+      const lastItem = document.querySelector('.drop-item:last-child')
+      if (lastItem) {
+        infiniteObserver.observe(lastItem)
+      }
     }
   })
 }
 
 // Watch for data changes to update observer
-watch(() => drops.value.length, () => {
+watch(() => drops.value.length, async () => {
+  await nextTick()
   updateObserverTarget()
+})
+
+// Watch for search term changes to ensure observer is properly updated
+watch(() => searchTerm.value, async (newTerm, oldTerm) => {
+  // When search is cleared, ensure observer is properly set up
+  if (oldTerm && !newTerm) {
+    await nextTick()
+    updateObserverTarget()
+  }
 })
 </script>
 
@@ -286,6 +340,19 @@ watch(() => drops.value.length, () => {
         <p v-else>暂无数据</p>
       </div>
     </div>
+
+    <!-- Back to Top Button -->
+    <button
+      v-if="showBackToTop"
+      @click="scrollToTop"
+      class="back-to-top"
+      title="返回顶部"
+      aria-label="返回顶部"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -733,6 +800,85 @@ h1 {
 
 .no-results p {
   margin: 5px 0;
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  color: #1a1a1a;
+}
+
+.back-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+}
+
+.back-to-top:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.back-to-top svg {
+  transition: transform 0.3s ease;
+}
+
+.back-to-top:hover svg {
+  transform: translateY(-2px);
+}
+
+/* Animation for button appearance */
+.back-to-top {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile optimization for back to top button */
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-to-top {
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .back-to-top svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* Dark theme adjustments */
