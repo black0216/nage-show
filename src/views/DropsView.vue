@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 
 interface DropItem {
   Name: string
@@ -15,20 +15,62 @@ interface DropData {
   DropItems: DropItem[]
 }
 
+// Global state for pagination
+let allDropsData: DropData[] = []
+
 const drops = ref<DropData[]>([])
 const searchTerm = ref('')
 const hoveredItem = ref<DropItem | null>(null)
 
-// Load drops data from JSON
-onMounted(async () => {
+// Pagination and loading states
+const ITEMS_PER_PAGE = 20
+const currentPage = ref(1)
+const isLoading = ref(false)
+const hasMore = ref(true)
+
+// Load drops data with pagination
+const loadMoreDrops = async (reset = false) => {
+  if (isLoading.value) return
+
+  isLoading.value = true
+
   try {
-    const response = await fetch('/Drops.json')
-    const data = await response.json()
-    drops.value = data
+    // If loading for the first time or resetting, load all data
+    if (reset || drops.value.length === 0) {
+      const response = await fetch('/Drops.json')
+      const allData = await response.json()
+
+      // Reset state
+      drops.value = []
+      currentPage.value = 1
+      hasMore.value = true
+
+      // Store all data for pagination
+      allDropsData = allData
+    }
+
+    // Get current page of data
+    const startIndex = (currentPage.value - 1) * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+    const pageData = allDropsData.slice(startIndex, endIndex)
+
+    // Add to existing drops
+    if (reset) {
+      drops.value = pageData
+    } else {
+      drops.value = [...drops.value, ...pageData]
+    }
+
+    // Update pagination state
+    currentPage.value++
+    hasMore.value = endIndex < allDropsData.length
+
   } catch (error) {
     console.error('Failed to load drops data:', error)
+  } finally {
+    isLoading.value = false
   }
-})
+}
 
 // Filter drops based on search term
 const filteredDrops = computed(() => {
@@ -38,6 +80,22 @@ const filteredDrops = computed(() => {
     drop.NpcName.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
 })
+
+// Handle search with debouncing
+let searchTimeout: number
+const handleSearch = (term: string) => {
+  clearTimeout(searchTimeout)
+
+  searchTimeout = setTimeout(() => {
+    if (term) {
+      // If searching, load all data and filter
+      loadMoreDrops(true)
+    } else {
+      // If search cleared, reset to pagination
+      loadMoreDrops(true)
+    }
+  }, 300)
+}
 
 // Calculate icon position for CSS background
 const getIconStyle = (sheet: string, x: number, y: number) => {
@@ -66,6 +124,72 @@ const getItemTypeText = (type: number): string => {
     default: return '未知'
   }
 }
+
+// Initialize component
+onMounted(() => {
+  loadMoreDrops(true)
+
+  // Setup intersection observer for infinite scroll
+  setupInfiniteScroll()
+})
+
+// Setup infinite scroll
+let infiniteObserver: IntersectionObserver | null = null
+
+const setupInfiniteScroll = () => {
+  infiniteObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && hasMore.value && !isLoading.value && !searchTerm.value) {
+          loadMoreDrops()
+        }
+      })
+    },
+    {
+      root: null,
+      rootMargin: '200px', // Start loading 200px before reaching bottom
+      threshold: 0.1
+    }
+  )
+
+  updateObserverTarget()
+
+  // Cleanup observer on unmount
+  onUnmounted(() => {
+    if (infiniteObserver) {
+      infiniteObserver.disconnect()
+    }
+  })
+}
+
+// Update observer target when data changes
+const updateObserverTarget = () => {
+  if (!infiniteObserver) return
+
+  // Disconnect from old targets
+  infiniteObserver.disconnect()
+
+  nextTick(() => {
+    if (!infiniteObserver) return
+
+    // Observe the infinite scroll trigger
+    const trigger = document.querySelector('.infinite-scroll-trigger')
+    if (trigger) {
+      infiniteObserver.observe(trigger)
+    }
+
+    // Also observe the last drop item as backup
+    const lastItem = document.querySelector('.drop-item:last-child')
+    if (lastItem) {
+      infiniteObserver.observe(lastItem)
+    }
+  })
+}
+
+// Watch for data changes to update observer
+watch(() => drops.value.length, () => {
+  updateObserverTarget()
+})
 </script>
 
 <template>
@@ -75,6 +199,7 @@ const getItemTypeText = (type: number): string => {
     <div class="filters">
       <input
         v-model="searchTerm"
+        @input="handleSearch(searchTerm)"
         type="text"
         placeholder="搜索怪物名称..."
         class="search-input"
@@ -137,6 +262,26 @@ const getItemTypeText = (type: number): string => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Infinite Scroll Trigger -->
+      <div v-if="!searchTerm && hasMore" class="infinite-scroll-trigger" style="height: 1px; width: 100%;"></div>
+
+      <!-- Auto-loading Indicator -->
+      <div v-if="!searchTerm && hasMore && isLoading" class="loading-indicator">
+        <div class="loading-spinner"></div>
+        <span>加载更多...</span>
+      </div>
+
+      <!-- No More Data -->
+      <div v-if="!searchTerm && !hasMore && filteredDrops.length > 0" class="no-more">
+        <span>已加载全部数据</span>
+      </div>
+
+      <!-- No Results -->
+      <div v-if="filteredDrops.length === 0 && !isLoading" class="no-results">
+        <p v-if="searchTerm">未找到 "{{ searchTerm }}" 相关的怪物</p>
+        <p v-else>暂无数据</p>
       </div>
     </div>
   </div>
@@ -530,6 +675,62 @@ h1 {
   position: absolute;
   left: 2px;
   color: #4ecdc4;
+}
+
+/* Infinite Scroll Trigger */
+.infinite-scroll-trigger {
+  height: 1px;
+  width: 100%;
+  visibility: hidden;
+}
+
+/* No More Data */
+.no-more {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  padding: 20px;
+  color: #ccc;
+  font-size: 16px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #333;
+  border-top: 3px solid #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  margin-top: 50px;
+  padding: 40px;
+  color: #888;
+  font-size: 18px;
+}
+
+.no-results p {
+  margin: 5px 0;
 }
 
 /* Dark theme adjustments */
