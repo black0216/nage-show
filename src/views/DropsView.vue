@@ -99,8 +99,10 @@ const handleSearch = (term: string) => {
 
 // Calculate icon position for CSS background
 const getIconStyle = (sheet: string, x: number, y: number) => {
-  const formattedSheet = sheet.startsWith('Item') ? sheet : `Item${sheet.padStart(2, '0')}`
+  // const formattedSheet = sheet.startsWith('Item') ? sheet : `Item${sheet.padStart(2, '0')}`
+  const formattedSheet = sheet.startsWith('Item') ? sheet : `Item${sheet.substring(sheet.length - 2)}`
   const iconPath = `/images/${formattedSheet}.jpg`
+
   const iconSize = 32 // Each icon is 32px (256/8)
   const backgroundX = -(y - 1) * iconSize
   const backgroundY = -(x - 1) * iconSize
