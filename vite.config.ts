@@ -7,6 +7,10 @@ import viteCompression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    host: '0.0.0.0',  // 允许外部访问
+    port: 3000        // 指定端口
+  },
   plugins: [
     vue(),
     vueDevTools(),

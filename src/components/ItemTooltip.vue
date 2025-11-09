@@ -23,12 +23,14 @@
         <div class="stats-title">基础属性</div>
         <div class="stats-grid">
           <div v-if="item.Equip.Ap > 0" class="stat-item">
-            <span class="stat-name">攻击力</span>
-            <span class="stat-value primary">{{ item.Equip.Ap }}</span>
+            <span class="stat-name">AP</span>
+<!--            <span class="stat-value primary">{{ item.Equip.Ap }}</span>-->
+            <span class="stat-value primary">{{ item.Equip.Ap }}<span v-if="item.Equip.AddAp > 0"> (+{{ item.Equip.AddAp }})</span></span>
+
           </div>
           <div v-if="item.Equip.Dp > 0" class="stat-item">
-            <span class="stat-name">防御力</span>
-            <span class="stat-value secondary">{{ item.Equip.Dp }}</span>
+            <span class="stat-name">DP</span>
+            <span class="stat-value secondary">{{ item.Equip.Dp }}<span v-if="item.Equip.AddDp > 0"> (+{{ item.Equip.AddDp }})</span></span>
           </div>
         </div>
       </div>
@@ -37,91 +39,84 @@
         <div class="stats-title">附加属性</div>
         <div class="stats-grid">
           <div v-if="item.Equip.AddHp > 0" class="stat-item">
-            <span class="stat-name">生命值</span>
+            <span class="stat-name">HP</span>
             <span class="stat-value hp">+{{ item.Equip.AddHp }}</span>
           </div>
           <div v-if="item.Equip.AddSp > 0" class="stat-item">
-            <span class="stat-name">法力值</span>
+            <span class="stat-name">SP</span>
             <span class="stat-value sp">+{{ item.Equip.AddSp }}</span>
           </div>
-          <div v-if="item.Equip.AddAp > 0" class="stat-item">
-            <span class="stat-name">攻击力</span>
-            <span class="stat-value ap">+{{ item.Equip.AddAp }}</span>
-          </div>
-          <div v-if="item.Equip.AddDp > 0" class="stat-item">
-            <span class="stat-name">防御力</span>
-            <span class="stat-value dp">+{{ item.Equip.AddDp }}</span>
-          </div>
+
           <div v-if="item.Equip.AddStr > 0" class="stat-item">
-            <span class="stat-name">力量</span>
+            <span class="stat-name">STR</span>
             <span class="stat-value str">+{{ item.Equip.AddStr }}</span>
           </div>
           <div v-if="item.Equip.AddDex > 0" class="stat-item">
-            <span class="stat-name">敏捷</span>
+            <span class="stat-name">DEX</span>
             <span class="stat-value dex">+{{ item.Equip.AddDex }}</span>
           </div>
           <div v-if="item.Equip.AddInt > 0" class="stat-item">
-            <span class="stat-name">智力</span>
+            <span class="stat-name">INT</span>
             <span class="stat-value int">+{{ item.Equip.AddInt }}</span>
           </div>
           <div v-if="item.Equip.AddSt > 0" class="stat-item">
-            <span class="stat-name">体力</span>
+            <span class="stat-name">ST</span>
             <span class="stat-value st">+{{ item.Equip.AddSt }}</span>
           </div>
           <div v-if="item.Equip.AddEsp > 0" class="stat-item">
-            <span class="stat-name">精神</span>
+            <span class="stat-name">SP</span>
             <span class="stat-value esp">+{{ item.Equip.AddEsp }}</span>
           </div>
           <div v-if="item.Equip.AddSpt > 0" class="stat-item">
-            <span class="stat-name">熟练</span>
+            <span class="stat-name">SPT</span>
             <span class="stat-value spt">+{{ item.Equip.AddSpt }}</span>
           </div>
           <div v-if="item.Equip.AddAsPer > 0" class="stat-item">
-            <span class="stat-name">攻击速度</span>
+            <span class="stat-name">增加攻击速度</span>
             <span class="stat-value asper">+{{ item.Equip.AddAsPer }}%</span>
           </div>
           <div v-if="item.Equip.AddApPer > 0" class="stat-item">
-            <span class="stat-name">攻击力</span>
+            <span class="stat-name">AP增加</span>
             <span class="stat-valueapper">+{{ item.Equip.AddApPer }}%</span>
           </div>
           <div v-if="item.Equip.AddDpPer > 0" class="stat-item">
-            <span class="stat-name">防御力</span>
+            <span class="stat-name">DP增加</span>
             <span class="stat-value dpper">+{{ item.Equip.AddDpPer }}%</span>
           </div>
           <div v-if="item.Equip.AddHpPer > 0" class="stat-item">
-            <span class="stat-name">生命值</span>
+            <span class="stat-name">HP增加</span>
             <span class="stat-value hpper">+{{ item.Equip.AddHpPer }}%</span>
           </div>
           <div v-if="item.Equip.AddSpPer > 0" class="stat-item">
-            <span class="stat-name">法力值</span>
+            <span class="stat-name">SP增加</span>
             <span class="stat-value spper">+{{ item.Equip.AddSpPer }}%</span>
           </div>
           <div v-if="item.Equip.AddMartial > 0" class="stat-item">
-            <span class="stat-name">武术伤害</span>
+            <span class="stat-name">格斗技巧</span>
             <span class="stat-value martial">+{{ item.Equip.AddMartial }}</span>
           </div>
           <div v-if="item.Equip.AddTactic > 0" class="stat-item">
-            <span class="stat-name">战术伤害</span>
+            <span class="stat-name">命中</span>
             <span class="stat-value tactic">+{{ item.Equip.AddTactic }}</span>
           </div>
           <div v-if="item.Equip.AddTacticPer > 0" class="stat-item">
-            <span class="stat-name">战术伤害</span>
+            <span class="stat-name">命中增加</span>
             <span class="stat-value tacticper">+{{ item.Equip.AddTacticPer }}%</span>
           </div>
           <div v-if="item.Equip.AddBrandish > 0" class="stat-item">
-            <span class="stat-name">武器熟练</span>
+            <span class="stat-name">舞械技巧</span>
             <span class="stat-value brandish">+{{ item.Equip.AddBrandish }}</span>
           </div>
           <div v-if="item.Equip.AddChakra > 0" class="stat-item">
-            <span class="stat-name">查克拉</span>
+            <span class="stat-name">超能技巧</span>
             <span class="stat-value chakra">+{{ item.Equip.AddChakra }}</span>
           </div>
           <div v-if="item.Equip.AddPrana > 0" class="stat-item">
-            <span class="stat-name">能量</span>
+            <span class="stat-name">枪手技巧</span>
             <span class="stat-value prana">+{{ item.Equip.AddPrana }}</span>
           </div>
           <div v-if="item.Equip.AddDodge > 0" class="stat-item">
-            <span class="stat-name">闪避</span>
+            <span class="stat-name">格挡</span>
             <span class="stat-value dodge">+{{ item.Equip.AddDodge }}</span>
           </div>
           <div v-if="item.Equip.AddMs > 0" class="stat-item">
@@ -140,50 +135,50 @@
           </div>
           <div v-if="item.Equip.NeedHero > 0" class="requirement-item">
             <span class="requirement-name">英雄等级</span>
-            <span class="requirement-value">{{ item.Equip.NeedHero }}</span>
+            <span class="requirement-value">{{ getHeroLevelText(item.Equip.NeedHero) }}</span>
           </div>
           <div v-if="item.Equip.NeedStr > 0" class="requirement-item">
-            <span class="requirement-name">力量</span>
+            <span class="requirement-name">STR</span>
             <span class="requirement-value">{{ item.Equip.NeedStr }}</span>
           </div>
           <div v-if="item.Equip.NeedDex > 0" class="requirement-item">
-            <span class="requirement-name">敏捷</span>
+            <span class="requirement-name">DEX</span>
             <span class="requirement-value">{{ item.Equip.NeedDex }}</span>
           </div>
           <div v-if="item.Equip.NeedInt > 0" class="requirement-item">
-            <span class="requirement-name">智力</span>
+            <span class="requirement-name">INT</span>
             <span class="requirement-value">{{ item.Equip.NeedInt }}</span>
           </div>
             <div v-if="item.Equip.NeedEsp > 0" class="requirement-item">
-            <span class="requirement-name">精神</span>
+            <span class="requirement-name">ESP</span>
             <span class="requirement-value">{{ item.Equip.NeedEsp }}</span>
           </div>
           <div v-if="item.Equip.NeedSpt > 0" class="requirement-item">
-            <span class="requirement-name">熟练</span>
+            <span class="requirement-name">SPT</span>
             <span class="requirement-value">{{ item.Equip.NeedSpt }}</span>
           </div>
           <div v-if="item.Equip.NeedChakra > 0" class="requirement-item">
-            <span class="requirement-name">查克拉</span>
+            <span class="requirement-name">超能技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedChakra }}</span>
           </div>
           <div v-if="item.Equip.NeedBrandish > 0" class="requirement-item">
-            <span class="requirement-name">武器熟练</span>
+            <span class="requirement-name">舞械技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedBrandish }}</span>
           </div>
           <div v-if="item.Equip.NeedMartial > 0" class="requirement-item">
-            <span class="requirement-name">武术</span>
+            <span class="requirement-name">格斗技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedMartial }}</span>
           </div>
           <div v-if="item.Equip.NeedTactic > 0" class="requirement-item">
-            <span class="requirement-name">战术</span>
+            <span class="requirement-name">命中技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedTactic }}</span>
           </div>
           <div v-if="item.Equip.NeedPrana > 0" class="requirement-item">
-            <span class="requirement-name">能量</span>
+            <span class="requirement-name">枪手技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedPrana }}</span>
           </div>
           <div v-if="item.Equip.NeedDodge > 0" class="requirement-item">
-            <span class="requirement-name">闪避</span>
+            <span class="requirement-name">格挡技巧</span>
             <span class="requirement-value">{{ item.Equip.NeedDodge }}</span>
           </div>
         </div>
@@ -239,6 +234,17 @@ const props = withDefaults(defineProps<Props>(), {
   visible: false,
   triggerElement: null
 })
+
+// Get hero level text from hero level ID
+const getHeroLevelText = (heroLevel: number): string => {
+  switch (heroLevel) {
+    case 0: return '不限'
+    case 1: return 'HERO'
+    case 2: return 'S-HERO'
+    case 3: return 'X-HERO'
+    default: return '未知'
+  }
+}
 
 // Template ref
 const tooltipRef = ref<HTMLElement | null>(null)
