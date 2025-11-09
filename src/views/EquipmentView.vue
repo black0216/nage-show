@@ -1,27 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
-
-interface EquipmentItem {
-  Part: number // 装备部位: 头部=9, 面具=1, 上衣=2, 下装=5, 鞋子=8, 右手=3, 左手=4, 特殊=6
-  Type: number // 道具类型: 1=普通, 2=礼包, 3=装备
-  Name: string
-  Sheet: string
-  X: number
-  Y: number
-}
-
-// 装备部位映射
-const PART_MAP: Record<string, string> = {
-  '1': '面具',
-  '2': '上衣',
-  '3': '右手',
-  '4': '左手',
-  '5': '下装',
-  '6': '特殊',
-  '8': '鞋子',
-  '9': '头部'
-}
+import type { EquipmentItem } from '../types'
+import { PART_MAP, CLASS_MAP } from '../types'
 
 // Global state for pagination
 let allEquipmentData: EquipmentItem[] = []
@@ -29,8 +10,10 @@ let allEquipmentData: EquipmentItem[] = []
 const equipment = ref<EquipmentItem[]>([])
 const searchTerm = ref('')
 const selectedPart = ref<string>('all')
+const selectedClass = ref<string>('all')
 const hoveredItem = ref<EquipmentItem | null>(null)
 const hoveredItemId = ref<string>('')
+const hoveredElement = ref<HTMLElement | null>(null)
 
 // Pagination and loading states
 const ITEMS_PER_PAGE = 20
@@ -96,7 +79,7 @@ const loadMoreEquipment = async (reset = false) => {
   }
 }
 
-// Get filtered data based on search and part
+// Get filtered data based on search, part, and class
 const getFilteredData = () => {
   let filtered = allEquipmentData
 
@@ -104,9 +87,18 @@ const getFilteredData = () => {
   if (selectedPart.value !== 'all') {
     const partNumber = Object.keys(PART_MAP).find(key => PART_MAP[key as keyof typeof PART_MAP] === selectedPart.value)
     if (partNumber) {
-      // @ts-ignore
-      filtered = filtered.filter(item => item.Part.toString() === partNumber)
+      filtered = filtered.filter(item => item.Equip.Part.toString() === partNumber)
     }
+  }
+
+  // Filter by class
+  if (selectedClass.value !== 'all') {
+    // Handle special class combinations (101, 102, etc.)
+    const classRequirement = getClassRequirement(selectedClass.value)
+    filtered = filtered.filter(item => {
+      const itemClass = item.Equip.NeedClass
+      return matchesClassRequirement(itemClass, classRequirement)
+    })
   }
 
   // Filter by search term
@@ -119,9 +111,51 @@ const getFilteredData = () => {
   return filtered
 }
 
-// Filter equipment based on search and part
+// Get class requirement numbers for filtering
+const getClassRequirement = (className: string): number[] => {
+  const classMap: Record<string, number[]> = {
+    '格斗': [0, 101],      // 格斗单独职业 + 格斗/舞械组合
+    '舞械': [2, 101],      // 舞械单独职业 + 格斗/舞械组合
+    '超能': [6, 102],      // 超能单独职业 + 超能/枪手组合
+    '枪手': [7, 102],      // 枪手单独职业 + 超能/枪手组合
+    '不限': [100],         // 不限职业
+    '格斗/舞械': [101],     // 专门的双职业组合
+    '超能/枪手': [102]      // 专门的双职业组合
+  }
+
+  // Find the class requirement by name
+  for (const [name, requirements] of Object.entries(classMap)) {
+    if (name === className) {
+      return requirements
+    }
+  }
+
+  // Try to find in CLASS_MAP and return as array
+  const classId = Object.keys(CLASS_MAP).find(key => CLASS_MAP[parseInt(key)] === className)
+  return classId ? [parseInt(classId)] : []
+}
+
+// Check if item class matches the requirement
+const matchesClassRequirement = (itemClass: number, requirement: number[]): boolean => {
+  if (requirement.length === 0) return true
+
+  return requirement.some(req => {
+    switch (req) {
+      case 100: // 不限
+        return true
+      case 101: // 格斗/舞械组合
+        return itemClass === 0 || itemClass === 2 || itemClass === 101
+      case 102: // 超能/枪手组合
+        return itemClass === 6 || itemClass === 7 || itemClass === 102
+      default:
+        return itemClass === req
+    }
+  })
+}
+
+// Filter equipment based on search, part, and class
 const filteredEquipment = computed(() => {
-  if (searchTerm.value || selectedPart.value !== 'all') {
+  if (searchTerm.value || selectedPart.value !== 'all' || selectedClass.value !== 'all') {
     // When searching or filtering, use all data
     return getFilteredData()
   }
@@ -134,7 +168,7 @@ const handleSearch = (term: string) => {
   clearTimeout(searchTimeout)
 
   searchTimeout = setTimeout(async () => {
-    if (term || selectedPart.value !== 'all') {
+    if (term || selectedPart.value !== 'all' || selectedClass.value !== 'all') {
       // If searching or filtering, ensure all data is loaded for complete search
       if (allEquipmentData.length === 0) {
         await loadMoreEquipment(true)
@@ -152,6 +186,12 @@ const handleSearch = (term: string) => {
 // Handle part filter
 const handlePartFilter = async (part: string) => {
   selectedPart.value = part
+  await handleSearch(searchTerm.value)
+}
+
+// Handle class filter
+const handleClassFilter = async (className: string) => {
+  selectedClass.value = className
   await handleSearch(searchTerm.value)
 }
 
@@ -178,7 +218,7 @@ const getIconStyle = (sheet: string, x: number, y: number) => {
 
 // Get unique identifier for an item
 const getItemId = (item: EquipmentItem, index?: number): string => {
-  const baseId = `${item.Name}_${item.Sheet}_${item.X}_${item.Y}_${item.Type}_${item.Part}`
+  const baseId = `${item.Name}_${item.Sheet}_${item.X}_${item.Y}_${item.Type}_${item.Equip.Part}`
 
   if (index !== undefined) {
     return `${baseId}_${index}`
@@ -188,13 +228,15 @@ const getItemId = (item: EquipmentItem, index?: number): string => {
 }
 
 // Handle item hover
-const handleItemHover = (item: EquipmentItem, index: number, isHovering: boolean) => {
-  if (isHovering) {
+const handleItemHover = (item: EquipmentItem, index: number, isHovering: boolean, event?: MouseEvent) => {
+  if (isHovering && event?.currentTarget) {
     hoveredItem.value = item
     hoveredItemId.value = getItemId(item, index)
+    hoveredElement.value = event.currentTarget as HTMLElement
   } else {
     hoveredItem.value = null
     hoveredItemId.value = ''
+    hoveredElement.value = null
   }
 }
 
@@ -219,7 +261,7 @@ const setupInfiniteScroll = () => {
   infiniteObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && hasMore.value && !isLoading.value && !searchTerm.value && selectedPart.value === 'all') {
+        if (entry.isIntersecting && hasMore.value && !isLoading.value && !searchTerm.value && selectedPart.value === 'all' && selectedClass.value === 'all') {
           loadMoreEquipment()
         }
       })
@@ -252,7 +294,7 @@ const updateObserverTarget = () => {
     if (!infiniteObserver) return
 
     // Only set up infinite scroll when not searching/filtering and there's more data to load
-    if (!searchTerm.value && selectedPart.value === 'all' && hasMore.value) {
+    if (!searchTerm.value && selectedPart.value === 'all' && selectedClass.value === 'all' && hasMore.value) {
       // Observe the infinite scroll trigger
       const trigger = document.querySelector('.infinite-scroll-trigger')
       if (trigger) {
@@ -275,10 +317,10 @@ watch(() => equipment.value.length, async () => {
 })
 
 // Watch for search and filter changes to ensure observer is properly updated
-watch(() => [searchTerm.value, selectedPart.value], async ([newTerm, newPart], [oldTerm, oldPart]) => {
+watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async ([newTerm, newPart, newClass], [oldTerm, oldPart, oldClass]) => {
   // When search or filter is cleared, ensure observer is properly set up
-  if ((oldTerm && !newTerm) || (oldPart !== 'all' && newPart === 'all')) {
-    if (!newTerm && newPart === 'all') {
+  if ((oldTerm && !newTerm) || (oldPart !== 'all' && newPart === 'all') || (oldClass !== 'all' && newClass === 'all')) {
+    if (!newTerm && newPart === 'all' && newClass === 'all') {
       await nextTick()
       updateObserverTarget()
     }
@@ -306,6 +348,25 @@ watch(() => [searchTerm.value, selectedPart.value], async ([newTerm, newPart], [
         </select>
       </div>
 
+      <!-- Class Filter -->
+      <div class="filter-group">
+        <label class="filter-label">职业:</label>
+        <select
+          v-model="selectedClass"
+          @change="handleClassFilter(selectedClass)"
+          class="class-select"
+        >
+          <option value="all">全部职业</option>
+          <option value="不限">不限</option>
+          <option value="格斗">格斗</option>
+          <option value="舞械">舞械</option>
+          <option value="超能">超能</option>
+          <option value="枪手">枪手</option>
+          <option value="格斗/舞械">格斗/舞械</option>
+          <option value="超能/枪手">超能/枪手</option>
+        </select>
+      </div>
+
       <!-- Search -->
       <div class="filter-group">
         <input
@@ -326,8 +387,8 @@ watch(() => [searchTerm.value, selectedPart.value], async ([newTerm, newPart], [
       >
         <div
           class="item-wrapper"
-          @mouseenter="handleItemHover(item, index, true)"
-          @mouseleave="handleItemHover(item, index, false)"
+          @mouseenter="(event) => handleItemHover(item, index, true, event)"
+          @mouseleave="(event) => handleItemHover(item, index, false, event)"
         >
           <div
             class="item-icon"
@@ -342,30 +403,32 @@ watch(() => [searchTerm.value, selectedPart.value], async ([newTerm, newPart], [
         <ItemTooltip
           :item="hoveredItem"
           :visible="hoveredItemId === getItemId(item, index)"
+          :trigger-element="hoveredElement"
         />
       </div>
     </div>
 
     <!-- Infinite Scroll Trigger -->
-    <div v-if="!searchTerm && selectedPart === 'all' && hasMore" class="infinite-scroll-trigger" style="height: 1px; width: 100%;"></div>
+    <div v-if="!searchTerm && selectedPart === 'all' && selectedClass === 'all' && hasMore" class="infinite-scroll-trigger" style="height: 1px; width: 100%;"></div>
 
     <!-- Auto-loading Indicator -->
-    <div v-if="!searchTerm && selectedPart === 'all' && hasMore && isLoading" class="loading-indicator">
+    <div v-if="!searchTerm && selectedPart === 'all' && selectedClass === 'all' && hasMore && isLoading" class="loading-indicator">
       <div class="loading-spinner"></div>
       <span>加载更多...</span>
     </div>
 
     <!-- No More Data -->
-    <div v-if="!searchTerm && selectedPart === 'all' && !hasMore && filteredEquipment.length > 0" class="no-more">
+    <div v-if="!searchTerm && selectedPart === 'all' && selectedClass === 'all' && !hasMore && filteredEquipment.length > 0" class="no-more">
       <span>已加载全部数据</span>
     </div>
 
     <!-- No Results -->
     <div v-if="filteredEquipment.length === 0 && !isLoading" class="no-results">
-      <p v-if="searchTerm || selectedPart !== 'all'">
+      <p v-if="searchTerm || selectedPart !== 'all' || selectedClass !== 'all'">
         未找到符合条件的装备
         <span v-if="searchTerm"> "{{ searchTerm }}"</span>
         <span v-if="selectedPart !== 'all'"> ({{ selectedPart }})</span>
+        <span v-if="selectedClass !== 'all'"> ({{ selectedClass }})</span>
       </p>
       <p v-else>暂无数据</p>
     </div>
@@ -438,6 +501,23 @@ h1 {
 }
 
 .part-select:focus {
+  border-color: #ffd700;
+}
+
+.class-select {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 2px solid #444;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.class-select:focus {
   border-color: #ffd700;
 }
 

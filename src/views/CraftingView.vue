@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
-
-interface CraftingItem {
-  Type: number // 1: 普通, 2: 礼包, 3: 装备
-  Name: string
-  Sheet: string
-  X: number
-  Y: number
-  Gifts?: string[]
-}
+import type { CraftingItem } from '../types'
 
 interface CraftingRecipe {
   Item: CraftingItem      // 最终道具
@@ -25,6 +17,7 @@ const crafting = ref<CraftingRecipe[]>([])
 const searchTerm = ref('')
 const hoveredItem = ref<CraftingItem | null>(null) // Current hovered item
 const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
+const hoveredElement = ref<HTMLElement | null>(null) // Current hovered DOM element
 
 // Pagination and loading states
 const ITEMS_PER_PAGE = 20
@@ -168,13 +161,15 @@ const getItemId = (item: CraftingItem, recipeIndex?: number, slotType?: string):
 }
 
 // Handle item hover
-const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: string, isHovering: boolean) => {
-  if (isHovering) {
+const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: string, isHovering: boolean, event?: MouseEvent) => {
+  if (isHovering && event?.currentTarget) {
     hoveredItem.value = item
     hoveredItemId.value = getItemId(item, recipeIndex, slotType)
+    hoveredElement.value = event.currentTarget as HTMLElement
   } else {
     hoveredItem.value = null
     hoveredItemId.value = ''
+    hoveredElement.value = null
   }
 }
 
@@ -293,8 +288,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <div
                 class="item-wrapper"
                 :class="{ 'equipment': recipe.ItemA.Type === 3, 'gift': recipe.ItemA.Type === 2 }"
-                @mouseenter="handleItemHover(recipe.ItemA, index, 'A', true)"
-                @mouseleave="handleItemHover(recipe.ItemA, index, 'A', false)"
+                @mouseenter="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
+                @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
               >
                 <div
                   class="item-icon"
@@ -308,6 +303,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 <ItemTooltip
                   :item="hoveredItem"
                   :visible="hoveredItemId === getItemId(recipe.ItemA, index, 'A')"
+                  :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -318,8 +314,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <div
                 class="item-wrapper"
                 :class="{ 'equipment': recipe.ItemB.Type === 3, 'gift': recipe.ItemB.Type === 2 }"
-                @mouseenter="handleItemHover(recipe.ItemB, index, 'B', true)"
-                @mouseleave="handleItemHover(recipe.ItemB, index, 'B', false)"
+                @mouseenter="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
+                @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
               >
                 <div
                   class="item-icon"
@@ -333,6 +329,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 <ItemTooltip
                   :item="hoveredItem"
                   :visible="hoveredItemId === getItemId(recipe.ItemB, index, 'B')"
+                  :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -343,8 +340,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <div
                 class="item-wrapper"
                 :class="{ 'equipment': recipe.ItemC.Type === 3, 'gift': recipe.ItemC.Type === 2 }"
-                @mouseenter="handleItemHover(recipe.ItemC, index, 'C', true)"
-                @mouseleave="handleItemHover(recipe.ItemC, index, 'C', false)"
+                @mouseenter="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
+                @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
               >
                 <div
                   class="item-icon"
@@ -358,6 +355,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 <ItemTooltip
                   :item="hoveredItem"
                   :visible="hoveredItemId === getItemId(recipe.ItemC, index, 'C')"
+                  :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -376,8 +374,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <div
               class="item-wrapper"
               :class="{ 'equipment': recipe.Item.Type === 3, 'gift': recipe.Item.Type === 2 }"
-              @mouseenter="handleItemHover(recipe.Item, index, 'Final', true)"
-              @mouseleave="handleItemHover(recipe.Item, index, 'Final', false)"
+              @mouseenter="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
+              @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
             >
               <div
                 class="item-icon result-icon"
@@ -391,6 +389,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <ItemTooltip
                 :item="hoveredItem"
                 :visible="hoveredItemId === getItemId(recipe.Item, index, 'Final')"
+                :trigger-element="hoveredElement"
               />
             </div>
           </div>

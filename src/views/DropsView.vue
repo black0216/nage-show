@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
-
-interface DropItem {
-  Name: string
-  Sheet: string
-  Type: number // 1: 普通, 2: 礼包, 3: 装备
-  X: number
-  Y: number
-  Gifts?: string[]
-}
+import type { DropItem } from '../types'
 
 interface DropData {
   NpcName: string
@@ -23,6 +15,7 @@ const drops = ref<DropData[]>([])
 const searchTerm = ref('')
 const hoveredItem = ref<DropItem | null>(null) // Current hovered item
 const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
+const hoveredElement = ref<HTMLElement | null>(null) // Current hovered DOM element
 
 // Pagination and loading states
 const ITEMS_PER_PAGE = 20
@@ -162,13 +155,15 @@ const getItemId = (item: DropItem, dropIndex?: number, itemIndex?: number): stri
 }
 
 // Handle item hover
-const handleItemHover = (item: DropItem, dropIndex: number, itemIndex: number, isHovering: boolean) => {
-  if (isHovering) {
+const handleItemHover = (item: DropItem, dropIndex: number, itemIndex: number, isHovering: boolean, event?: MouseEvent) => {
+  if (isHovering && event?.currentTarget) {
     hoveredItem.value = item
     hoveredItemId.value = getItemId(item, dropIndex, itemIndex)
+    hoveredElement.value = event.currentTarget as HTMLElement
   } else {
     hoveredItem.value = null
     hoveredItemId.value = ''
+    hoveredElement.value = null
   }
 }
 
@@ -289,8 +284,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
           >
             <div
               class="item-wrapper"
-              @mouseenter="handleItemHover(item, dropIndex, itemIndex, true)"
-              @mouseleave="handleItemHover(item, dropIndex, itemIndex, false)"
+              @mouseenter="(event) => handleItemHover(item, dropIndex, itemIndex, true, event)"
+              @mouseleave="(event) => handleItemHover(item, dropIndex, itemIndex, false, event)"
             >
               <div
                 class="item-icon"
@@ -305,6 +300,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <ItemTooltip
               :item="hoveredItem"
               :visible="hoveredItemId === getItemId(item, dropIndex, itemIndex)"
+              :trigger-element="hoveredElement"
             />
           </div>
         </div>
