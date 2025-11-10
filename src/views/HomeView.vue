@@ -1,206 +1,125 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
-// Welcome messages rotation
-const welcomeMessages = [
-  "欢迎来到游戏世界！",
-  "探索无尽的冒险之旅",
-  "与全球玩家一起战斗",
-  "发现稀有装备和道具"
-]
-
-const currentMessageIndex = ref(0)
-const isVisible = ref(true)
-
-// Rotate welcome messages
-let messageInterval: number
-
-const rotateMessage = () => {
-  isVisible.value = false
-  setTimeout(() => {
-    currentMessageIndex.value = (currentMessageIndex.value + 1) % welcomeMessages.length
-    isVisible.value = true
-  }, 300)
-}
-
-// Parallax effect for hero section
-const handleScroll = () => {
-  const scrolled = window.scrollY
-  const parallax = document.querySelector('.hero-section') as HTMLElement
-  if (parallax) {
-    // Reduce parallax effect to prevent overlap issues
-    parallax.style.transform = `translateY(${Math.min(scrolled * 0.3, 100)}px)`
-  }
-}
-
 onMounted(() => {
-  messageInterval = setInterval(rotateMessage, 4000)
-  window.addEventListener('scroll', handleScroll)
+  // 可以添加其他初始化逻辑
 })
 
-onUnmounted(() => {
-  if (messageInterval) {
-    clearInterval(messageInterval)
-  }
-  window.removeEventListener('scroll', handleScroll)
-})
 
-// Quick navigation stats
-const quickStats = [
-  { label: "装备总数", value: "10,000+", icon: "⚔️" },
-  { label: "合成配方", value: "5,000+", icon: "🔨" },
-  { label: "怪物种类", value: "800+", icon: "👾" },
-  { label: "在线玩家", value: "50,000+", icon: "👥" }
-]
 
-// Feature cards
-const features = [
+// Server features
+const serverFeatures = [
   {
-    title: "装备查询",
-    description: "浏览完整的装备数据库，查看详细属性和获取方式",
-    icon: "🛡️",
-    link: "/equipment",
-    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    title: "材料叠加系统",
+    description: "纳米/黄金/重生/改造/紫水晶/支票 都可以叠加（包括升级可直接叠加放入）",
+    icon: "🔷",
+    highlight: "无限叠加",
+    gradient: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
   },
   {
-    title: "掉落查询",
-    description: "查询各种怪物的掉落表，规划你的 farming 路线",
-    icon: "💎",
-    link: "/drops",
-    gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+    title: "超强自动补药",
+    description: "自动补药的容量增加到20E，让您一次爽个够！可离线挂机摆摊！",
+    icon: "💊",
+    highlight: "20E容量",
+    gradient: "linear-gradient(135deg, #00C851 0%, #00FF00 100%)"
   },
   {
-    title: "合成配方",
-    description: "探索道具合成系统，发现强大的装备制作方法",
-    icon: "⚗️",
-    link: "/crafting",
-    gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+    title: "装备强化系统",
+    description: "装备开放+9（部分有隐藏属性）+1-3用纳米/+4-6用黄金/+7-9用紫水晶",
+    icon: "⚔️",
+    highlight: "+9强化",
+    gradient: "linear-gradient(135deg, #FF6B6B 0%, #C9302C 100%)"
   },
   {
-    title: "玩家排行",
-    description: "查看顶级玩家排行榜，了解游戏中的强者",
+    title: "伊甸商店",
+    description: "伊甸NPC可直接购买包括光环特效、装备皮肤及对应的各种道具打造属于自己的外观",
+    icon: "✨",
+    highlight: "外观定制",
+    gradient: "linear-gradient(135deg, #9C27B0 0%, #E91E63 100%)"
+  },
+  {
+    title: "积分商城",
+    description: "开放积分商城人物等级100后在线1小时可获得6积分，可在伊甸积分NPC购买道具",
+    icon: "🎫",
+    highlight: "在线奖励",
+    gradient: "linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)"
+  },
+  {
+    title: "传送卡兑换",
+    description: "传送卡可用礼包的装备去NPC对话更换哦！免费的坚固药水，让你24小时挂机不烦脑",
+    icon: "🎁",
+    highlight: "免费药水",
+    gradient: "linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)"
+  },
+  {
+    title: "每日竞技场",
+    description: "每晚8点开放竞技场持续20分钟，竞技排名前五奖励2W钻石。注：竞技场是激情之地，严禁消极刷分 一经举报核实将取消刷分者奖励",
     icon: "🏆",
-    link: "/ranking",
-    gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+    highlight: "钻石奖励",
+    gradient: "linear-gradient(135deg, #FF9800 0%, #FF5722 100%)"
+  },
+  {
+    title: "定期活动",
+    description: "本服还将定期和不定期的发放福利以及开展每周和每月活动",
+    icon: "🎉",
+    highlight: "丰富活动",
+    gradient: "linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)"
+  },
+  {
+    title: "会员系统",
+    description: "开放等级制会员，每日上线可领取对应级别会员礼品。礼品均为绑定",
+    icon: "👑",
+    highlight: "每日礼品",
+    gradient: "linear-gradient(135deg, #795548 0%, #8D6E63 100%)"
+  },
+  {
+    title: "VIP特权",
+    description: "VIP新增（飞旗数量，远程组队，钱满自动换票，仓库数量增加）",
+    icon: "💎",
+    highlight: "专属特权",
+    gradient: "linear-gradient(135deg, #607D8B 0%, #90A4AE 100%)"
   }
 ]
 
-// Recent updates
-const recentUpdates = [
-  {
-    title: "新版本 2.5.0 更新",
-    description: "全新地图、装备副本上线",
-    time: "2小时前",
-    type: "update"
-  },
-  {
-    title: "周末双倍经验活动",
-    description: "本周末所有经验值翻倍",
-    time: "5小时前",
-    type: "event"
-  },
-  {
-    title: "系统维护通知",
-    description: "明天凌晨2点进行服务器维护",
-    time: "1天前",
-    type: "maintenance"
-  }
-]
+// Footer notice
+const footerNotice = "欢迎大家提供宝贵建议 如您所提建议一经采纳 将给您奉上一份神秘大礼"
+
 </script>
 
 <template>
   <div class="home-view">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-content">
-        <h1 class="hero-title">
-          <span class="title-gradient">游戏资料站</span>
-        </h1>
-        <p class="hero-subtitle" :class="{ 'fade-in': isVisible }">
-          {{ welcomeMessages[currentMessageIndex] }}
-        </p>
-        <div class="hero-stats">
-          <div
-            v-for="(stat, index) in quickStats"
-            :key="index"
-            class="stat-item"
-          >
-            <div class="stat-icon">{{ stat.icon }}</div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stat.value }}</div>
-              <div class="stat-label">{{ stat.label }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="hero-particles">
-        <div class="particle" v-for="i in 20" :key="i" :style="{
-          '--delay': `${i * 0.2}s`,
-          '--duration': `${3 + Math.random() * 4}s`
-        }"></div>
-      </div>
-    </section>
+    <!-- Header -->
+    <header class="home-header">
+      <h1 class="main-title">本服特色</h1>
+      <p class="subtitle">十大核心特色系统，打造极致游戏体验</p>
+    </header>
 
-    <!-- Quick Access Section -->
-    <section class="quick-access">
-      <h2 class="section-title">快速导航</h2>
-      <div class="features-grid">
+    <!-- Server Features Section -->
+    <section class="server-features">
+      <div class="server-features-container">
         <div
-          v-for="(feature, index) in features"
+          v-for="(feature, index) in serverFeatures"
           :key="index"
-          class="feature-card"
-          @click="$router.push(feature.link)"
+          class="server-feature-card"
         >
-          <div class="card-header" :style="{ background: feature.gradient }">
-            <div class="card-icon">{{ feature.icon }}</div>
+          <div class="feature-badge" :style="{ background: feature.gradient }">
+            {{ feature.highlight }}
           </div>
-          <div class="card-body">
+          <div class="feature-content">
+            <div class="feature-icon">{{ feature.icon }}</div>
             <h3>{{ feature.title }}</h3>
             <p>{{ feature.description }}</p>
-            <div class="card-link">立即查看 →</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Recent Updates Section -->
-    <section class="recent-updates">
-      <h2 class="section-title">最新动态</h2>
-      <div class="updates-container">
-        <div
-          v-for="(update, index) in recentUpdates"
-          :key="index"
-          class="update-item"
-        >
-          <div class="update-icon" :class="update.type">
-            <span v-if="update.type === 'update'">📱</span>
-            <span v-else-if="update.type === 'event'">🎉</span>
-            <span v-else>🔧</span>
-          </div>
-          <div class="update-content">
-            <h4>{{ update.title }}</h4>
-            <p>{{ update.description }}</p>
-            <span class="update-time">{{ update.time }}</span>
-          </div>
-        </div>
+    <!-- Footer Notice -->
+    <footer class="footer-notice">
+      <div class="notice-content">
+        <p>💡 {{ footerNotice }}</p>
       </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="cta-section">
-      <div class="cta-content">
-        <h2>开始你的冒险之旅</h2>
-        <p>加入我们，探索无限可能的游戏世界</p>
-        <div class="cta-buttons">
-          <button class="cta-button primary" @click="$router.push('/equipment')">
-            查看装备
-          </button>
-          <button class="cta-button secondary" @click="$router.push('/ranking')">
-            排行榜
-          </button>
-        </div>
-      </div>
-    </section>
+    </footer>
   </div>
 </template>
 
@@ -212,32 +131,18 @@ const recentUpdates = [
   overflow-x: hidden;
 }
 
-/* Hero Section */
-.hero-section {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
-  z-index: 1;
-}
-
-.hero-content {
+/* Header */
+.home-header {
   text-align: center;
-  z-index: 2;
-  max-width: 1000px;
-  width: 100%;
+  padding: 4rem 2rem 2rem;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
 }
 
-.hero-title {
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  margin-bottom: 1.5rem;
+.main-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: 1rem;
   font-weight: 700;
-}
-
-.title-gradient {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -251,106 +156,12 @@ const recentUpdates = [
   50% { opacity: 0.8; }
 }
 
-.hero-subtitle {
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
+.subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
   color: #ccc;
-  margin-bottom: 3rem;
-  line-height: 1.6;
-  transition: opacity 0.3s ease;
-}
-
-.fade-in {
-  opacity: 1;
-}
-
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.stat-item:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 215, 0, 0.4);
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
-}
-
-.stat-icon {
-  font-size: 2rem;
-  opacity: 0.8;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffd700;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #ccc;
-  opacity: 0.8;
-}
-
-/* Particles */
-.hero-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 215, 0, 0.6);
-  border-radius: 50%;
-  animation: float var(--duration) ease-in-out infinite;
-  animation-delay: var(--delay);
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) translateX(0px);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(50px);
-    opacity: 0;
-  }
-}
-
-/* Quick Access Section */
-.quick-access {
-  padding: 4rem 4rem;
-  max-width: 1400px;
+  max-width: 600px;
   margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  line-height: 1.6;
 }
 
 .section-title {
@@ -361,305 +172,183 @@ const recentUpdates = [
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+/* Server Features Section */
+.server-features {
+  padding: 2rem 4rem 4rem;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.02) 0%, transparent 100%);
+  position: relative;
+  z-index: 2;
 }
 
-.feature-card {
+.server-features-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.server-feature-card {
   background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
   border-radius: 16px;
-  overflow: hidden;
+  padding: 2rem;
   border: 1px solid #444;
-  cursor: pointer;
-  transition: all 0.3s ease;
   position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
 }
 
-.feature-card:hover {
+.server-feature-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   border-color: #666;
 }
 
-.card-header {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.card-icon {
-  font-size: 3rem;
-  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-}
-
-.card-body {
-  padding: 2rem;
-}
-
-.card-body h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #fff;
-}
-
-.card-body p {
-  color: #ccc;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-.card-link {
-  color: #ffd700;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.feature-card:hover .card-link {
-  transform: translateX(5px);
-}
-
-/* Recent Updates Section */
-.recent-updates {
-  padding: 4rem 4rem;
-  background: rgba(255, 255, 255, 0.02);
-  position: relative;
+.feature-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   z-index: 2;
+  white-space: nowrap;
 }
 
-.updates-container {
+.feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  padding-right: 6rem;
+}
+
+/* Mobile responsive for server features */
+@media (max-width: 768px) {
+  .feature-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding-right: 0;
+  }
+
+  .feature-icon {
+    align-self: center;
+    font-size: 2.5rem;
+  }
+
+  .server-feature-card {
+    padding: 1.5rem;
+  }
+
+  .feature-badge {
+    position: static;
+    margin-bottom: 1rem;
+    align-self: center;
+  }
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+  align-self: flex-start;
+}
+
+.server-feature-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  line-height: 1.3;
+}
+
+.server-feature-card p {
+  color: #ccc;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  flex: 1;
+  margin: 0;
+}
+
+/* Footer Notice */
+.footer-notice {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  padding: 2rem;
+  text-align: center;
+}
+
+.notice-content {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-.update-item {
-  display: flex;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 12px;
-  border: 1px solid #444;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-.update-item:hover {
-  border-color: #666;
-  transform: translateX(5px);
-}
-
-.update-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.update-icon.update {
-  background: rgba(102, 126, 234, 0.2);
-  border: 1px solid rgba(102, 126, 234, 0.4);
-}
-
-.update-icon.event {
-  background: rgba(240, 147, 251, 0.2);
-  border: 1px solid rgba(240, 147, 251, 0.4);
-}
-
-.update-icon.maintenance {
-  background: rgba(255, 193, 7, 0.2);
-  border: 1px solid rgba(255, 193, 7, 0.4);
-}
-
-.update-content {
-  flex: 1;
-}
-
-.update-content h4 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #fff;
-}
-
-.update-content p {
-  color: #ccc;
-  margin-bottom: 0.5rem;
-}
-
-.update-time {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-/* CTA Section */
-.cta-section {
-  padding: 6rem 4rem;
-  text-align: center;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
-  position: relative;
-  z-index: 2;
-}
-
-.cta-content h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+.notice-content p {
   color: #ffd700;
-}
-
-.cta-content p {
-  font-size: 1.3rem;
-  color: #ccc;
-  margin-bottom: 2.5rem;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.cta-button {
-  padding: 1rem 2.5rem;
-  border-radius: 30px;
   font-size: 1.1rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.cta-button.primary {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  color: #1a1a1a;
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
-}
-
-.cta-button.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4);
-}
-
-.cta-button.secondary {
-  background: transparent;
-  color: #ffd700;
-  border: 2px solid #ffd700;
-}
-
-.cta-button.secondary:hover {
-  background: rgba(255, 215, 0, 0.1);
-  transform: translateY(-2px);
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .quick-access {
-    padding: 4rem 3rem;
-    max-width: 1200px;
+  .home-header {
+    padding: 3rem 2rem 1.5rem;
   }
 
-  .features-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+  .server-features {
+    padding: 1.5rem 3rem 3rem;
   }
 
-  .recent-updates {
-    padding: 4rem 3rem;
-  }
-
-  .cta-section {
-    padding: 6rem 3rem;
+  .server-features-container {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 1rem;
+  .home-header {
+    padding: 2rem 1.5rem 1rem;
   }
 
-  .hero-content {
-    max-width: 100%;
+  .server-features {
+    padding: 1rem 2rem 2rem;
   }
 
-  .hero-stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .stat-item {
-    padding: 1rem;
-  }
-
-  .quick-access {
-    padding: 3rem 2rem;
-    max-width: 100%;
-  }
-
-  .features-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .server-features-container {
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
-  .recent-updates {
-    padding: 3rem 2rem;
-  }
-
-  .cta-section {
-    padding: 5rem 2rem;
-  }
-
-  .cta-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .cta-button {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .section-title {
-    font-size: 2rem;
+  .footer-notice {
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .hero-title {
-    font-size: 2.5rem;
+  .home-header {
+    padding: 1.5rem 1rem 0.5rem;
   }
 
-  .hero-stats {
-    grid-template-columns: 1fr;
+  .server-features {
+    padding: 0.5rem 1rem 1.5rem;
   }
 
-  .quick-access,
-  .recent-updates {
-    padding: 2rem 1rem;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .update-item {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .cta-section {
-    padding: 4rem 1rem;
+  .footer-notice {
+    padding: 1rem;
   }
 }
+
 
 /* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {

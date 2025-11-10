@@ -438,7 +438,7 @@ watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async (
 
 <style scoped>
 .equipment-view {
-  padding: 20px;
+  padding: 20px 200px;
   width: 100%;
   max-width: none;
   margin: 0;
@@ -451,13 +451,13 @@ watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async (
 /* Responsive padding */
 @media (min-width: 1600px) {
   .equipment-view {
-    padding: 30px;
+    padding: 30px 200px;
   }
 }
 
 @media (min-width: 1920px) {
   .equipment-view {
-    padding: 40px;
+    padding: 40px 200px;
   }
 }
 
@@ -541,8 +541,15 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fill, 60px);
   gap: 12px;
-  justify-content: start;
+  justify-content: center;
   width: 100%;
+  padding: 20px;
+  border: 2px solid #444;
+  border-radius: 12px;
+  background-color: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(10px);
+  margin: 0 auto;
+  max-width: 1200px;
 }
 
 .equipment-item {
@@ -722,7 +729,7 @@ h1 {
 /* Mobile optimization */
 @media (max-width: 479px) {
   .equipment-view {
-    padding: 10px;
+    padding: 10px 20px;
   }
 
   .filters {
@@ -743,6 +750,8 @@ h1 {
   .equipment-container {
     grid-template-columns: repeat(auto-fill, 55px);
     gap: 8px;
+    padding: 15px;
+    max-width: 100%;
   }
 
   .item-wrapper {

@@ -13,6 +13,7 @@ let allDropsData: DropData[] = []
 
 const drops = ref<DropData[]>([])
 const searchTerm = ref('')
+const itemSearchTerm = ref('')
 const hoveredItem = ref<DropItem | null>(null) // Current hovered item
 const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
 const hoveredElement = ref<HTMLElement | null>(null) // Current hovered DOM element
@@ -80,21 +81,62 @@ const loadMoreDrops = async (reset = false) => {
 
 // Filter drops based on search term
 const filteredDrops = computed(() => {
-  if (!searchTerm.value) return drops.value
+  let filteredDropsData: DropData[]
 
-  // Search from all data instead of just loaded data
-  return allDropsData.filter(drop =>
-    drop.NpcName.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
+  // If searching, use all data; otherwise use paginated data
+  if (searchTerm.value || itemSearchTerm.value) {
+    filteredDropsData = allDropsData
+  } else {
+    filteredDropsData = drops.value
+  }
+
+  // Filter by monster name
+  if (searchTerm.value) {
+    filteredDropsData = filteredDropsData.filter(drop =>
+      drop.NpcName.toLowerCase().includes(searchTerm.value.toLowerCase())
+    )
+  }
+
+  // Filter by item name
+  if (itemSearchTerm.value) {
+    filteredDropsData = filteredDropsData.filter(drop =>
+      drop.DropItems.some(item =>
+        item.Name.toLowerCase().includes(itemSearchTerm.value.toLowerCase())
+      )
+    )
+  }
+
+  return filteredDropsData
 })
 
 // Handle search with debouncing
 let searchTimeout: number
-const handleSearch = (term: string) => {
+const handleSearch = async (term: string) => {
   clearTimeout(searchTimeout)
 
   searchTimeout = setTimeout(async () => {
-    if (term) {
+    if (term || itemSearchTerm.value) {
+      // If searching, ensure all data is loaded for complete search
+      if (allDropsData.length === 0) {
+        await loadMoreDrops(true)
+      }
+    } else {
+      // If search cleared, reset to pagination and ensure observer works
+      await loadMoreDrops(true)
+      // Force update observer after DOM is updated
+      await nextTick()
+      updateObserverTarget()
+    }
+  }, 300)
+}
+
+// Handle item search with debouncing
+let itemSearchTimeout: number
+const handleItemSearch = async (term: string) => {
+  clearTimeout(itemSearchTimeout)
+
+  itemSearchTimeout = setTimeout(async () => {
+    if (term || searchTerm.value) {
       // If searching, ensure all data is loaded for complete search
       if (allDropsData.length === 0) {
         await loadMoreDrops(true)
@@ -246,7 +288,16 @@ watch(() => drops.value.length, async () => {
 // Watch for search term changes to ensure observer is properly updated
 watch(() => searchTerm.value, async (newTerm, oldTerm) => {
   // When search is cleared, ensure observer is properly set up
-  if (oldTerm && !newTerm) {
+  if (oldTerm && !newTerm && !itemSearchTerm.value) {
+    await nextTick()
+    updateObserverTarget()
+  }
+})
+
+// Watch for item search term changes to ensure observer is properly updated
+watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
+  // When search is cleared, ensure observer is properly set up
+  if (oldTerm && !newTerm && !searchTerm.value) {
     await nextTick()
     updateObserverTarget()
   }
@@ -258,13 +309,22 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
     <h1>掉落表</h1>
 
     <div class="filters">
-      <input
-        v-model="searchTerm"
-        @input="handleSearch(searchTerm)"
-        type="text"
-        placeholder="搜索怪物名称..."
-        class="search-input"
-      />
+      <div class="search-container">
+        <input
+          v-model="searchTerm"
+          @input="handleSearch(searchTerm)"
+          type="text"
+          placeholder="搜索怪物名称..."
+          class="search-input"
+        />
+        <input
+          v-model="itemSearchTerm"
+          @input="handleItemSearch(itemSearchTerm)"
+          type="text"
+          placeholder="搜索道具名称..."
+          class="search-input"
+        />
+      </div>
     </div>
 
     <div class="drops-container">
@@ -322,7 +382,9 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 
       <!-- No Results -->
       <div v-if="filteredDrops.length === 0 && !isLoading" class="no-results">
-        <p v-if="searchTerm">未找到 "{{ searchTerm }}" 相关的怪物</p>
+        <p v-if="searchTerm && itemSearchTerm">未找到 "{{ searchTerm }}" 和 "{{ itemSearchTerm }}" 相关的结果</p>
+        <p v-else-if="searchTerm">未找到 "{{ searchTerm }}" 相关的怪物</p>
+        <p v-else-if="itemSearchTerm">未找到掉落 "{{ itemSearchTerm }}" 的怪物</p>
         <p v-else>暂无数据</p>
       </div>
     </div>
@@ -332,7 +394,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 
 <style scoped>
 .drops-view {
-  padding: 20px;
+  padding: 20px 200px;
   width: 100%;
   max-width: none;
   margin: 0;
@@ -345,13 +407,13 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 /* Responsive padding */
 @media (min-width: 1600px) {
   .drops-view {
-    padding: 30px;
+    padding: 30px 200px;
   }
 }
 
 @media (min-width: 1920px) {
   .drops-view {
-    padding: 40px;
+    padding: 40px 200px;
   }
 }
 
@@ -367,6 +429,14 @@ h1 {
   text-align: center;
 }
 
+.search-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .search-input {
   padding: 10px 15px;
   border-radius: 25px;
@@ -374,7 +444,7 @@ h1 {
   background-color: #2a2a2a;
   color: #fff;
   font-size: 16px;
-  width: 300px;
+  width: 250px;
   outline: none;
   transition: border-color 0.3s;
 }
@@ -536,7 +606,12 @@ h1 {
 /* Mobile optimization */
 @media (max-width: 479px) {
   .drops-view {
-    padding: 10px;
+    padding: 10px 20px;
+  }
+
+  .search-container {
+    flex-direction: column;
+    gap: 15px;
   }
 
   .search-input {

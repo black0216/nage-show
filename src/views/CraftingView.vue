@@ -88,10 +88,10 @@ const filteredCrafting = computed(() => {
   return allCraftingData.filter(recipe => {
     const searchLower = searchTerm.value.toLowerCase()
     return (
-      recipe.Item.Name.toLowerCase().includes(searchLower) ||
-      recipe.ItemA.Name.toLowerCase().includes(searchLower) ||
-      recipe.ItemB.Name.toLowerCase().includes(searchLower) ||
-      recipe.ItemC.Name.toLowerCase().includes(searchLower)
+        recipe.Item.Name.toLowerCase().includes(searchLower) ||
+        recipe.ItemA.Name.toLowerCase().includes(searchLower) ||
+        recipe.ItemB.Name.toLowerCase().includes(searchLower) ||
+        recipe.ItemC.Name.toLowerCase().includes(searchLower)
     )
   })
 })
@@ -185,25 +185,25 @@ onMounted(async () => {
   // Setup intersection observer for infinite scroll
   setupInfiniteScroll()
 
-  })
+})
 
 // Setup infinite scroll
 let infiniteObserver: IntersectionObserver | null = null
 
 const setupInfiniteScroll = () => {
   infiniteObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && hasMore.value && !isLoading.value && !searchTerm.value) {
-          loadMoreCrafting()
-        }
-      })
-    },
-    {
-      root: null,
-      rootMargin: '200px', // Start loading 200px before reaching bottom
-      threshold: 0.1
-    }
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && hasMore.value && !isLoading.value && !searchTerm.value) {
+            loadMoreCrafting()
+          }
+        })
+      },
+      {
+        root: null,
+        rootMargin: '200px', // Start loading 200px before reaching bottom
+        threshold: 0.1
+      }
   )
 
   updateObserverTarget()
@@ -265,19 +265,19 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 
     <div class="filters">
       <input
-        v-model="searchTerm"
-        @input="handleSearch(searchTerm)"
-        type="text"
-        placeholder="搜索道具名称..."
-        class="search-input"
+          v-model="searchTerm"
+          @input="handleSearch(searchTerm)"
+          type="text"
+          placeholder="搜索道具名称..."
+          class="search-input"
       />
     </div>
 
     <div class="crafting-container">
       <div
-        v-for="(recipe, index) in filteredCrafting"
-        :key="index"
-        class="crafting-item"
+          v-for="(recipe, index) in filteredCrafting"
+          :key="index"
+          class="crafting-item"
       >
         <div class="materials-section">
           <div class="section-title">合成材料</div>
@@ -286,24 +286,24 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <div class="material-container">
               <div class="slot-label">A槽</div>
               <div
-                class="item-wrapper"
-                :class="{ 'equipment': recipe.ItemA.Type === 3, 'gift': recipe.ItemA.Type === 2 }"
-                @mouseenter="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
-                @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
+                  class="item-wrapper"
+                  :class="{ 'equipment': recipe.ItemA.Type === 3, 'gift': recipe.ItemA.Type === 2 }"
+                  @mouseenter="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
+                  @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
               >
                 <div
-                  class="item-icon"
-                  :style="getIconStyle(recipe.ItemA.Sheet, recipe.ItemA.X, recipe.ItemA.Y)"
-                  :alt="recipe.ItemA.Name"
+                    class="item-icon"
+                    :style="getIconStyle(recipe.ItemA.Sheet, recipe.ItemA.X, recipe.ItemA.Y)"
+                    :alt="recipe.ItemA.Name"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemA.Name }}</div>
 
                 <!-- Item Tooltip Component -->
                 <ItemTooltip
-                  :item="hoveredItem"
-                  :visible="hoveredItemId === getItemId(recipe.ItemA, index, 'A')"
-                  :trigger-element="hoveredElement"
+                    :item="hoveredItem"
+                    :visible="hoveredItemId === getItemId(recipe.ItemA, index, 'A')"
+                    :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -312,24 +312,24 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <div class="material-container">
               <div class="slot-label">B槽</div>
               <div
-                class="item-wrapper"
-                :class="{ 'equipment': recipe.ItemB.Type === 3, 'gift': recipe.ItemB.Type === 2 }"
-                @mouseenter="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
-                @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
+                  class="item-wrapper"
+                  :class="{ 'equipment': recipe.ItemB.Type === 3, 'gift': recipe.ItemB.Type === 2 }"
+                  @mouseenter="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
+                  @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
               >
                 <div
-                  class="item-icon"
-                  :style="getIconStyle(recipe.ItemB.Sheet, recipe.ItemB.X, recipe.ItemB.Y)"
-                  :alt="recipe.ItemB.Name"
+                    class="item-icon"
+                    :style="getIconStyle(recipe.ItemB.Sheet, recipe.ItemB.X, recipe.ItemB.Y)"
+                    :alt="recipe.ItemB.Name"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemB.Name }}</div>
 
                 <!-- Item Tooltip Component -->
                 <ItemTooltip
-                  :item="hoveredItem"
-                  :visible="hoveredItemId === getItemId(recipe.ItemB, index, 'B')"
-                  :trigger-element="hoveredElement"
+                    :item="hoveredItem"
+                    :visible="hoveredItemId === getItemId(recipe.ItemB, index, 'B')"
+                    :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -338,24 +338,24 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
             <div class="material-container">
               <div class="slot-label">C槽</div>
               <div
-                class="item-wrapper"
-                :class="{ 'equipment': recipe.ItemC.Type === 3, 'gift': recipe.ItemC.Type === 2 }"
-                @mouseenter="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
-                @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
+                  class="item-wrapper"
+                  :class="{ 'equipment': recipe.ItemC.Type === 3, 'gift': recipe.ItemC.Type === 2 }"
+                  @mouseenter="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
+                  @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
               >
                 <div
-                  class="item-icon"
-                  :style="getIconStyle(recipe.ItemC.Sheet, recipe.ItemC.X, recipe.ItemC.Y)"
-                  :alt="recipe.ItemC.Name"
+                    class="item-icon"
+                    :style="getIconStyle(recipe.ItemC.Sheet, recipe.ItemC.X, recipe.ItemC.Y)"
+                    :alt="recipe.ItemC.Name"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemC.Name }}</div>
 
                 <!-- Item Tooltip Component -->
                 <ItemTooltip
-                  :item="hoveredItem"
-                  :visible="hoveredItemId === getItemId(recipe.ItemC, index, 'C')"
-                  :trigger-element="hoveredElement"
+                    :item="hoveredItem"
+                    :visible="hoveredItemId === getItemId(recipe.ItemC, index, 'C')"
+                    :trigger-element="hoveredElement"
                 />
               </div>
             </div>
@@ -372,24 +372,24 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
           <div class="section-title">合成结果</div>
           <div class="result-container">
             <div
-              class="item-wrapper"
-              :class="{ 'equipment': recipe.Item.Type === 3, 'gift': recipe.Item.Type === 2 }"
-              @mouseenter="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
-              @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
+                class="item-wrapper"
+                :class="{ 'equipment': recipe.Item.Type === 3, 'gift': recipe.Item.Type === 2 }"
+                @mouseenter="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
+                @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
             >
               <div
-                class="item-icon result-icon"
-                :style="getIconStyle(recipe.Item.Sheet, recipe.Item.X, recipe.Item.Y)"
-                :alt="recipe.Item.Name"
+                  class="item-icon result-icon"
+                  :style="getIconStyle(recipe.Item.Sheet, recipe.Item.X, recipe.Item.Y)"
+                  :alt="recipe.Item.Name"
               >
               </div>
               <div class="item-name-label">{{ recipe.Item.Name }}</div>
 
               <!-- Item Tooltip Component -->
               <ItemTooltip
-                :item="hoveredItem"
-                :visible="hoveredItemId === getItemId(recipe.Item, index, 'Final')"
-                :trigger-element="hoveredElement"
+                  :item="hoveredItem"
+                  :visible="hoveredItemId === getItemId(recipe.Item, index, 'Final')"
+                  :trigger-element="hoveredElement"
               />
             </div>
           </div>
@@ -417,7 +417,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
       </div>
     </div>
 
-      </div>
+  </div>
 </template>
 
 <style scoped>

@@ -59,5 +59,37 @@ Requires Node.js ^20.19.0 or >=22.12.0
 - Uses `vue-tsc` for type checking `.vue` files
 - Volar extension in VS Code is recommended for proper TypeScript support
 
+### Application Overview
+This is a Chinese gaming database website for a game called "nage-show". The application provides:
+- Equipment database and lookup
+- Monster drop tables
+- Crafting recipes
+- Player rankings
+- Home dashboard with game statistics
+
+### Project Structure
+```
+src/
+├── main.ts                    # Application entry point
+├── App.vue                    # Root component with navigation
+├── router/
+│   └── index.ts               # Vue Router configuration with hash routing
+├── views/
+│   ├── HomeView.vue           # Landing page with hero section and feature cards
+│   ├── DropsView.vue          # Monster drop tables
+│   ├── EquipmentView.vue      # Equipment database
+│   ├── CraftingView.vue       # Crafting recipes
+│   └── RankingView.vue        # Player rankings
+├── components/
+│   └── BackToTop.vue          # Global back-to-top button
+└── style.css                  # Global styles
+```
+
 ### Current State
-This is a fresh Vue 3 project with minimal setup - the router is configured but has no routes defined, and the App.vue contains placeholder content.
+This is a fully functional Vue 3 gaming database website with:
+- Complete navigation system with 5 main routes
+- Responsive design with dark theme
+- Modern UI with gradients, animations, and particle effects
+- Hash-based routing for GitHub Pages compatibility
+- Gzip compression enabled for production builds
+- Global components like BackToTop functionality

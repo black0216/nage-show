@@ -71,16 +71,7 @@ import BackToTop from './components/BackToTop.vue'
 
 .main-content {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
-  background: rgba(26, 26, 26, 0.3);
-  border-radius: 8px;
-  margin: 1rem auto;
-  backdrop-filter: blur(5px);
+  min-height: calc(100vh - 80px); /* 减去header高度 */
 }
 </style>
