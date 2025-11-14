@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
-import type { CraftingItem } from '../types'
+import type { CraftingItem } from '@/types'
 
 interface CraftingRecipe {
   Item: CraftingItem      // 最终道具
