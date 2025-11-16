@@ -17,7 +17,7 @@ let allCraftingData: CraftingRecipe[] = []
 const crafting = ref<CraftingRecipe[]>([])
 const searchTerm = ref('')
 const hoveredItem = ref<CraftingItem | null>(null) // Current hovered item
-const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
+const hoveredItemId = ref<string | null>(null) // Use unique identifier for hovered item
 const hoveredElement = ref<HTMLElement | null>(null) // Current hovered DOM element
 
 // Pagination and loading states
@@ -167,7 +167,7 @@ const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: stri
     hoveredElement.value = event.currentTarget as HTMLElement
   } else {
     hoveredItem.value = null
-    hoveredItemId.value = ''
+    hoveredItemId.value = null
     hoveredElement.value = null
   }
 }
@@ -298,13 +298,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 </div>
                 <div class="item-name-label">{{ recipe.ItemA.Name }}</div>
 
-                <!-- Item Tooltip Component -->
-                <ItemTooltip
-                    :item="hoveredItem"
-                    :visible="hoveredItemId === getItemId(recipe.ItemA, index, 'A')"
-                    :trigger-element="hoveredElement"
-                />
-              </div>
+                </div>
             </div>
 
             <!-- Material B -->
@@ -324,13 +318,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 </div>
                 <div class="item-name-label">{{ recipe.ItemB.Name }}</div>
 
-                <!-- Item Tooltip Component -->
-                <ItemTooltip
-                    :item="hoveredItem"
-                    :visible="hoveredItemId === getItemId(recipe.ItemB, index, 'B')"
-                    :trigger-element="hoveredElement"
-                />
-              </div>
+                  </div>
             </div>
 
             <!-- Material C -->
@@ -350,13 +338,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 </div>
                 <div class="item-name-label">{{ recipe.ItemC.Name }}</div>
 
-                <!-- Item Tooltip Component -->
-                <ItemTooltip
-                    :item="hoveredItem"
-                    :visible="hoveredItemId === getItemId(recipe.ItemC, index, 'C')"
-                    :trigger-element="hoveredElement"
-                />
-              </div>
+                    </div>
             </div>
           </div>
         </div>
@@ -385,12 +367,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
               <div class="item-name-label">{{ recipe.Item.Name }}</div>
 
               <!-- Item Tooltip Component -->
-              <ItemTooltip
-                  :item="hoveredItem"
-                  :visible="hoveredItemId === getItemId(recipe.Item, index, 'Final')"
-                  :trigger-element="hoveredElement"
-              />
-            </div>
+              </div>
           </div>
         </div>
       </div>
@@ -416,19 +393,27 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
       </div>
     </div>
 
+    <!-- Global Item Tooltip -->
+    <ItemTooltip
+      :item="hoveredItem"
+      :visible="hoveredItemId !== null"
+      :trigger-element="hoveredElement"
+    />
+
   </div>
 </template>
 
 <style scoped>
 .crafting-view {
-  padding: 20px;
+  padding: 2rem;
   width: 100%;
   max-width: none;
   margin: 0;
-  background-color: #1a1a1a;
+  background: transparent;
   color: #fff;
   min-height: 100vh;
   box-sizing: border-box;
+  position: relative;
 }
 
 /* Responsive padding */
@@ -446,30 +431,57 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 
 h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 3rem;
+  color: rgba(203, 213, 225, 0.95);
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+h1::before {
+  content: '⚗️';
+  font-size: 2rem;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+}
+
+h1::after {
+  content: '🔨';
+  font-size: 2rem;
+  animation: bounce 2s infinite 0.5s;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
 }
 
 .filters {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
 .search-input {
-  padding: 10px 15px;
+  padding: 0.8rem 1.5rem;
   border-radius: 25px;
-  border: 2px solid #444;
-  background-color: #2a2a2a;
-  color: #fff;
-  font-size: 16px;
+  border: 2px solid rgba(71, 85, 105, 0.4);
+  background: rgba(30, 41, 59, 0.8);
+  color: rgba(203, 213, 225, 0.9);
+  font-size: 1rem;
   width: 300px;
   outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.search-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
 }
 
 .search-input:focus {
-  border-color: #ffd700;
+  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(51, 65, 85, 0.8);
+  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
 }
 
 .crafting-container {
@@ -479,23 +491,44 @@ h1 {
 }
 
 .crafting-item {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 12px;
-  padding: 25px;
-  border: 1px solid #444;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 2rem;
   flex-wrap: wrap;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.crafting-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
+  border-radius: 16px 16px 0 0;
+}
+
+.crafting-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  border-color: rgba(148, 163, 184, 0.4);
 }
 
 .section-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #ffd700;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: rgba(203, 213, 225, 0.95);
+  text-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
 }
 
 .materials-section {

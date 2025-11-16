@@ -257,113 +257,59 @@ const tooltipStyle = ref<Record<string, string>>({})
 const calculatePosition = async () => {
   if (!props.visible || !props.triggerElement) return
 
-  // First, reset to default to get accurate measurements
-  tooltipStyle.value = {
-    position: 'absolute',
-    bottom: 'calc(100% + 10px)',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    top: 'auto',
-    right: 'auto'
-  }
-  position.value = 'top'
-
   await nextTick()
 
-  // Get measurements after applying default position
+  // Get trigger element position
   const trigger = props.triggerElement.getBoundingClientRect()
   const viewport = {
     width: window.innerWidth,
     height: window.innerHeight
   }
 
-  // Estimate tooltip dimensions (use max-width as fallback)
-  let tooltipWidth = 350 // max-width from CSS
-  let tooltipHeight = 200 // estimated height
+  // Default tooltip dimensions (more compact)
+  let tooltipWidth = 280
+  let tooltipHeight = 200
 
+  // Try to get actual tooltip dimensions
   if (tooltipRef.value) {
-    const tooltipRect = tooltipRef.value.getBoundingClientRect()
-    tooltipWidth = tooltipRect.width || tooltipWidth
-    tooltipHeight = tooltipRect.height || tooltipHeight
+    const rect = tooltipRef.value.getBoundingClientRect()
+    if (rect.width > 0) tooltipWidth = rect.width
+    if (rect.height > 0) tooltipHeight = rect.height
   }
 
-  // Calculate available space
-  const spaceAbove = trigger.top
-  const spaceBelow = viewport.height - trigger.bottom
-  const spaceLeft = trigger.left
-  const spaceRight = viewport.width - trigger.right
+  // Calculate position - centered on trigger
+  let left = trigger.left + (trigger.width / 2) - (tooltipWidth / 2)
+  let top = trigger.top - tooltipHeight - 10
 
-  // Determine best position with priority order: top > bottom > left > right
-  if (spaceAbove >= tooltipHeight + 10) {
-    // Show above (default)
-    position.value = 'top'
-    tooltipStyle.value = {
-      position: 'absolute',
-      bottom: 'calc(100% + 10px)',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      top: 'auto',
-      right: 'auto'
-    }
-  } else if (spaceBelow >= tooltipHeight + 10) {
-    // Show below
+  // Position preference: top > bottom
+  if (trigger.top - tooltipHeight - 10 < 10) {
+    // Not enough space above, show below
+    top = trigger.bottom + 10
     position.value = 'bottom'
-    tooltipStyle.value = {
-      position: 'absolute',
-      top: 'calc(100% + 10px)',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      bottom: 'auto',
-      right: 'auto'
-    }
-  } else if (spaceLeft >= tooltipWidth + 10) {
-    // Show to the left
-    position.value = 'left'
-    tooltipStyle.value = {
-      position: 'absolute',
-      right: 'calc(100% + 10px)',
-      top: '50%',
-      transform: 'translateY(-50%)',
-      left: 'auto',
-      bottom: 'auto'
-    }
-  } else if (spaceRight >= tooltipWidth + 10) {
-    // Show to the right
-    position.value = 'right'
-    tooltipStyle.value = {
-      position: 'absolute',
-      left: 'calc(100% + 10px)',
-      top: '50%',
-      transform: 'translateY(-50%)',
-      right: 'auto',
-      bottom: 'auto'
-    }
   } else {
-    // Fallback: use fixed positioning to fit in viewport
     position.value = 'top'
-    let left = trigger.left + (trigger.width / 2) - (tooltipWidth / 2)
-    let top = trigger.top - tooltipHeight - 10
+  }
 
-    // Ensure tooltip stays within viewport bounds with 10px margin
-    if (left < 10) {
-      left = 10
-    } else if (left + tooltipWidth > viewport.width - 10) {
-      left = viewport.width - tooltipWidth - 10
-    }
+  // Ensure tooltip stays within viewport bounds
+  if (left < 10) {
+    left = 10
+  } else if (left + tooltipWidth > viewport.width - 10) {
+    left = viewport.width - tooltipWidth - 10
+  }
 
-    if (top < 10) {
-      // If no space above, show below instead
-      top = trigger.bottom + 10
-    }
+  // Final position check
+  if (top < 10) {
+    top = 10
+  } else if (top + tooltipHeight > viewport.height - 10) {
+    top = viewport.height - tooltipHeight - 10
+  }
 
-    tooltipStyle.value = {
-      position: 'fixed',
-      top: `${top}px`,
-      left: `${left}px`,
-      transform: 'none',
-      bottom: 'auto',
-      right: 'auto'
-    }
+  // Apply final positioning
+  tooltipStyle.value = {
+    position: 'fixed',
+    top: `${top}px`,
+    left: `${left}px`,
+    zIndex: '999999'
   }
 }
 
@@ -420,17 +366,29 @@ const getSkillName = (skillId: number): string => {
 
 <style scoped>
 .item-tooltip {
-  position: absolute;
-  background: linear-gradient(135deg, #333 0%, #222 100%);
-  border: 2px solid #555;
-  border-radius: 6px;
-  padding: 10px;
+  position: fixed !important;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(71, 85, 105, 0.4);
+  border-radius: 12px;
+  padding: 0.75rem;
   min-width: 250px;
-  max-width: 350px;
-  z-index: 1000;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+  max-width: 320px;
+  z-index: 999999 !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   white-space: normal;
+}
+
+.item-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
+  border-radius: 16px 16px 0 0;
 }
 
 /* Position-specific arrow styles */
@@ -441,7 +399,7 @@ const getSkillName = (skillId: number): string => {
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-top-color: #555;
+  border-top-color: rgba(71, 85, 105, 0.6);
 }
 
 .item-tooltip.tooltip-bottom::after {
@@ -451,7 +409,7 @@ const getSkillName = (skillId: number): string => {
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-bottom-color: #555;
+  border-bottom-color: rgba(71, 85, 105, 0.6);
 }
 
 .item-tooltip.tooltip-left::after {
@@ -461,7 +419,7 @@ const getSkillName = (skillId: number): string => {
   right: 100%;
   transform: translateY(-50%);
   border: 8px solid transparent;
-  border-right-color: #555;
+  border-right-color: rgba(71, 85, 105, 0.6);
 }
 
 .item-tooltip.tooltip-right::after {
@@ -471,72 +429,77 @@ const getSkillName = (skillId: number): string => {
   left: 100%;
   transform: translateY(-50%);
   border: 8px solid transparent;
-  border-left-color: #555;
+  border-left-color: rgba(71, 85, 105, 0.6);
 }
 
 .tooltip-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #444;
-  padding-bottom: 6px;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+  padding-bottom: 0.4rem;
 }
 
 .item-name {
-  font-weight: bold;
-  color: #ffd700;
-  font-size: 14px;
+  font-weight: 700;
+  color: rgba(203, 213, 225, 0.95);
+  font-size: 0.9rem;
+  text-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
 }
 
 .item-type {
-  background-color: #555;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(76, 29, 149, 0.3);
 }
 
 .gift-contents {
-  margin-top: 8px;
+  margin-top: 0.6rem;
 }
 
 .gift-title {
-  font-weight: bold;
-  color: #4ecdc4;
-  margin-bottom: 6px;
-  font-size: 13px;
+  font-weight: 700;
+  color: rgba(52, 211, 153, 0.9);
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
 }
 
 .gift-items {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.25rem;
 }
 
 .gift-item-name {
-  color: #ccc;
-  font-size: 12px;
-  padding-left: 10px;
+  color: rgba(203, 213, 225, 0.8);
+  font-size: 0.7rem;
+  padding-left: 0.8rem;
   position: relative;
+  line-height: 1.3;
 }
 
 .gift-item-name::before {
-  content: '•';
+  content: '✨';
   position: absolute;
-  left: 2px;
-  color: #4ecdc4;
+  left: 0;
+  color: rgba(52, 211, 153, 0.8);
 }
 
 /* Equipment Stats Styling */
 .equipment-stats {
-  margin-top: 8px;
+  margin-top: 1rem;
 }
 
 .stats-section {
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #444;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
 }
 
 .stats-section:last-child {
@@ -546,118 +509,235 @@ const getSkillName = (skillId: number): string => {
 }
 
 .stats-title {
-  font-weight: bold;
-  color: #ffd700;
-  margin-bottom: 6px;
-  font-size: 13px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  font-weight: 700;
+  color: rgba(203, 213, 225, 0.95);
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  text-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stats-title::before {
+  content: '⚡';
+  font-size: 0.7rem;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 8px;
-  font-size: 12px;
+  gap: 0.3rem 0.8rem;
+  font-size: 0.75rem;
 }
 
 .stat-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 0;
+  padding: 0.2rem 0.4rem;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 6px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(51, 65, 85, 0.6);
+  border-color: rgba(168, 85, 247, 0.3);
+  transform: translateY(-1px);
 }
 
 .stat-name {
-  color: #ccc;
-  font-size: 11px;
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 0.65rem;
+  font-weight: 500;
 }
 
 .stat-value {
-  font-weight: bold;
-  font-size: 11px;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-shadow: 0 0 8px rgba(0,0,0,0.5);
 }
 
-.stat-value.primary { color: #ff6b6b; }
-.stat-value.secondary { color: #4ecdc4; }
-.stat-value.hp { color: #ff4757; }
-.stat-value.sp { color: #3742fa; }
-.stat-value.ap { color: #ff6348; }
-.stat-value.dp { color: #2ed573; }
-.stat-value.str { color: #ffa502; }
-.stat-value.dex { color: #ff9ff3; }
-.stat-value.int { color: #7bed9f; }
-.stat-value.st { color: #ff7675; }
-.stat-value.esp { color: #70a1ff; }
-.stat-value.spt { color: #ff6348; }
-.stat-value.asper { color: #ff9ff3; }
-.stat-valueapper { color: #ff6348; }
-.stat-value.dpper { color: #2ed573; }
-.stat-value.hpper { color: #ff4757; }
-.stat-value.spper { color: #3742fa; }
-.stat-value.martial { color: #ff6b6b; }
-.stat-value.tactic { color: #4834d4; }
-.stat-value.tacticper { color: #686de0; }
-.stat-value.brandish { color: #f9ca24; }
-.stat-value.chakra { color: #f0932b; }
-.stat-value.prana { color: #eb4d4b; }
-.stat-value.dodge { color: #22a6b3; }
-.stat-value.ms { color: #6c5ce7; }
+.stat-value.primary {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.secondary {
+  color: rgba(52, 211, 153, 0.9);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+}
+.stat-value.hp {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.sp {
+  color: rgba(96, 165, 250, 0.9);
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+}
+.stat-value.ap {
+  color: rgba(251, 146, 60, 0.9);
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.5);
+}
+.stat-value.dp {
+  color: rgba(74, 222, 128, 0.9);
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+.stat-value.str {
+  color: rgba(251, 191, 36, 0.9);
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+}
+.stat-value.dex {
+  color: rgba(244, 114, 182, 0.9);
+  text-shadow: 0 0 8px rgba(244, 114, 182, 0.5);
+}
+.stat-value.int {
+  color: rgba(134, 239, 172, 0.9);
+  text-shadow: 0 0 8px rgba(134, 239, 172, 0.5);
+}
+.stat-value.st {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.esp {
+  color: rgba(165, 180, 252, 0.9);
+  text-shadow: 0 0 8px rgba(165, 180, 252, 0.5);
+}
+.stat-value.spt {
+  color: rgba(251, 146, 60, 0.9);
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.5);
+}
+.stat-value.asper {
+  color: rgba(244, 114, 182, 0.9);
+  text-shadow: 0 0 8px rgba(244, 114, 182, 0.5);
+}
+.stat-valueapper {
+  color: rgba(251, 146, 60, 0.9);
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.5);
+}
+.stat-value.dpper {
+  color: rgba(74, 222, 128, 0.9);
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+.stat-value.hpper {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.spper {
+  color: rgba(96, 165, 250, 0.9);
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+}
+.stat-value.martial {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.tactic {
+  color: rgba(139, 92, 246, 0.9);
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+.stat-value.tacticper {
+  color: rgba(167, 139, 250, 0.9);
+  text-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+.stat-value.brandish {
+  color: rgba(250, 204, 21, 0.9);
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
+.stat-value.chakra {
+  color: rgba(251, 146, 60, 0.9);
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.5);
+}
+.stat-value.prana {
+  color: rgba(248, 113, 113, 0.9);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+.stat-value.dodge {
+  color: rgba(34, 197, 94, 0.9);
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+.stat-value.ms {
+  color: rgba(168, 85, 247, 0.9);
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+}
 
 /* Requirements Styling */
 .requirements-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 8px;
-  font-size: 11px;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.65rem;
 }
 
 .requirement-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 0;
+  padding: 0.2rem 0.4rem;
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 4px;
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  transition: all 0.3s ease;
+}
+
+.requirement-item:hover {
+  background: rgba(51, 65, 85, 0.5);
+  border-color: rgba(168, 85, 247, 0.2);
 }
 
 .requirement-name {
-  color: #999;
-  font-size: 10px;
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 0.6rem;
+  font-weight: 500;
 }
 
 .requirement-value {
-  color: #ff6348;
-  font-weight: bold;
-  font-size: 10px;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  color: rgba(251, 146, 60, 0.9);
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.4);
 }
 
 /* Skills Styling */
 .skills-grid {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.3rem;
 }
 
 .skill-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3px 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-  border-left: 3px solid #9b59b6;
+  padding: 0.3rem 0.5rem;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 6px;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-left: 2px solid rgba(168, 85, 247, 0.6);
+  transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+  background: rgba(51, 65, 85, 0.6);
+  border-color: rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
 }
 
 .skill-name {
-  color: #fff;
-  font-size: 11px;
-  font-weight: 500;
+  color: rgba(203, 213, 225, 0.9);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .skill-level {
-  color: #9b59b6;
-  font-weight: bold;
-  font-size: 11px;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+  color: rgba(168, 85, 247, 0.9);
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  background: rgba(168, 85, 247, 0.2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 8px;
 }
+
 </style>

@@ -3,9 +3,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // Ranking categories
 const categories = [
-  { id: 'level', name: '等级榜', icon: '⭐' },
-  { id: 'power', name: '战力榜', icon: '⚔️' },
-  { id: 'guild', name: '公会榜', icon: '🏰' },
+  { id: 'level', name: '等级榜', icon: '⚡' },
+  { id: 'power', name: '战力榜', icon: '🦾' },
+  { id: 'guild', name: '公会榜', icon: '🏙️' },
   { id: 'pvp', name: '竞技榜', icon: '🎯' }
 ]
 
@@ -14,8 +14,8 @@ const selectedCategory = ref('level')
 // Mock ranking data
 const generateMockData = (category: string) => {
   const baseNames = ['暗影', '圣光', '狂战', '元素', '神射', '龙骑', '死灵', '时空', '风暴', '冰霜']
-  const classes = ['刺客', '法师', '战士', '弓箭手', '龙骑士', '死灵法师', '时空法师', '风暴召唤者']
-  const guilds = ['龙之军团', '光明联盟', '狂战部落', '元素学院', '猎鹰公会', '暗影兄弟会', '圣殿骑士团']
+  const classes = ['格斗士', '超能者', '枪手', '舞械者', '格斗士', '超能者', '枪手', '舞械者']
+  const guilds = ['科技军团', '光明联盟', '都市部落', '元素学院', '猎鹰公会', '暗影兄弟会', '圣殿骑士团']
 
   const data = []
   for (let i = 1; i <= 100; i++) {
@@ -41,9 +41,9 @@ const generateMockData = (category: string) => {
 
 const getRankTitle = (rank: number) => {
   switch(rank) {
-    case 1: return '最强王者'
-    case 2: return '超凡大师'
-    case 3: return '璀璨钻石'
+    case 1: return '都市霸主'
+    case 2: return '科技大师'
+    case 3: return '未来精英'
     default: return null
   }
 }
@@ -120,9 +120,9 @@ onUnmounted(() => {
     <!-- Header Section -->
     <section class="ranking-header">
       <h1 class="page-title">
-        <span class="title-gradient">玩家排行榜</span>
+        <span class="title-gradient">N-Age 排行榜</span>
       </h1>
-      <p class="page-subtitle">实时更新 · 每10秒自动刷新</p>
+      <p class="page-subtitle">未来都市精英榜 · 每10秒自动刷新</p>
 
       <!-- Category Tabs -->
       <div class="category-tabs">
@@ -265,28 +265,28 @@ onUnmounted(() => {
           <div class="stat-icon">👥</div>
           <div class="stat-content">
             <div class="stat-value">50,000+</div>
-            <div class="stat-label">活跃玩家</div>
+            <div class="stat-label">都市先锋</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">⚔️</div>
+          <div class="stat-icon">🦾</div>
           <div class="stat-content">
             <div class="stat-value">3.5M</div>
-            <div class="stat-label">最高战力</div>
+            <div class="stat-label">科技战力</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🏰</div>
+          <div class="stat-icon">🏙️</div>
           <div class="stat-content">
             <div class="stat-value">500+</div>
-            <div class="stat-label">活跃公会</div>
+            <div class="stat-label">科技公会</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">🔄</div>
+          <div class="stat-icon">⚡</div>
           <div class="stat-content">
             <div class="stat-value">10s</div>
-            <div class="stat-label">更新频率</div>
+            <div class="stat-label">实时更新</div>
           </div>
         </div>
       </div>
@@ -297,9 +297,10 @@ onUnmounted(() => {
 <style scoped>
 .ranking-view {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  background: transparent;
   color: #fff;
   padding: 2rem;
+  position: relative;
 }
 
 /* Header Section */
@@ -315,16 +316,16 @@ onUnmounted(() => {
 }
 
 .title-gradient {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00d4ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
 }
 
 .page-subtitle {
   font-size: 1.2rem;
-  color: #ccc;
+  color: rgba(203, 213, 225, 0.8);
   margin-bottom: 2rem;
 }
 
@@ -340,8 +341,9 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border: 2px solid #444;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(71, 85, 105, 0.4);
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -356,10 +358,10 @@ onUnmounted(() => {
 }
 
 .category-tab.active {
-  background: linear-gradient(135deg, #444 0%, #333 100%);
-  border-color: #ffd700;
-  color: #ffd700;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border-color: #00d4ff;
+  color: #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
 }
 
 .tab-icon {
@@ -416,18 +418,18 @@ onUnmounted(() => {
 }
 
 .podium-player.rank-1 .player-card {
-  border-color: #ffd700;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  border-color: #00d4ff;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
 }
 
 .podium-player.rank-2 .player-card {
-  border-color: #c0c0c0;
-  box-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
 .podium-player.rank-3 .player-card {
-  border-color: #cd7f32;
-  box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+  border-color: #60a5fa;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
 }
 
 .player-card:hover {
@@ -477,7 +479,7 @@ onUnmounted(() => {
 .player-title {
   margin-top: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
   color: #1a1a1a;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -517,7 +519,7 @@ onUnmounted(() => {
 }
 
 .stat-value {
-  color: #ffd700;
+  color: #00d4ff;
   font-weight: 700;
   font-size: 1.1rem;
 }
@@ -568,20 +570,21 @@ onUnmounted(() => {
 }
 
 .rankings-container {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
-  border: 1px solid #444;
+  border: 1px solid rgba(59, 130, 246, 0.3);
   overflow: hidden;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 80px 1fr 80px 120px 150px 80px;
-  background: linear-gradient(135deg, #444 0%, #333 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   padding: 1.5rem;
   font-weight: 600;
-  color: #ffd700;
-  border-bottom: 2px solid #555;
+  color: #00d4ff;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.5);
 }
 
 .table-header > div {
@@ -708,7 +711,7 @@ onUnmounted(() => {
 }
 
 .power-value {
-  color: #ffd700;
+  color: #00d4ff;
   font-weight: 600;
 }
 
@@ -729,8 +732,8 @@ onUnmounted(() => {
 
 .load-more-btn {
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #444 0%, #333 100%);
-  border: 2px solid #666;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border: 2px solid rgba(59, 130, 246, 0.5);
   border-radius: 30px;
   color: #fff;
   cursor: pointer;
@@ -743,10 +746,10 @@ onUnmounted(() => {
 }
 
 .load-more-btn:hover {
-  border-color: #ffd700;
-  color: #ffd700;
+  border-color: #00d4ff;
+  color: #00d4ff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
 /* Stats Overview */
@@ -762,10 +765,11 @@ onUnmounted(() => {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
   padding: 2rem;
-  border: 1px solid #444;
+  border: 1px solid rgba(59, 130, 246, 0.3);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -774,8 +778,8 @@ onUnmounted(() => {
 
 .stat-card:hover {
   transform: translateY(-2px);
-  border-color: #666;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
 .stat-icon {
@@ -790,7 +794,7 @@ onUnmounted(() => {
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #ffd700;
+  color: #00d4ff;
   margin-bottom: 0.5rem;
 }
 

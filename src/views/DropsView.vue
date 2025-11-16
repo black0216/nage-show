@@ -16,7 +16,7 @@ const drops = ref<DropData[]>([])
 const searchTerm = ref('')
 const itemSearchTerm = ref('')
 const hoveredItem = ref<DropItem | null>(null) // Current hovered item
-const hoveredItemId = ref<string>('') // Use unique identifier for hovered item
+const hoveredItemId = ref<string | null>(null) // Use unique identifier for hovered item
 const hoveredElement = ref<HTMLElement | null>(null) // Current hovered DOM element
 
 // Pagination and loading states
@@ -203,7 +203,7 @@ const handleItemHover = (item: DropItem, dropIndex: number, itemIndex: number, i
     hoveredElement.value = event.currentTarget as HTMLElement
   } else {
     hoveredItem.value = null
-    hoveredItemId.value = ''
+    hoveredItemId.value = null
     hoveredElement.value = null
   }
 }
@@ -355,13 +355,7 @@ watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
               <div class="item-name-label">{{ item.Name }}</div>
             </div>
 
-            <!-- Item Tooltip Component -->
-            <ItemTooltip
-              :item="hoveredItem"
-              :visible="hoveredItemId === getItemId(item, dropIndex, itemIndex)"
-              :trigger-element="hoveredElement"
-            />
-          </div>
+            </div>
         </div>
       </div>
 
@@ -388,19 +382,27 @@ watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
       </div>
     </div>
 
+    <!-- Global Item Tooltip - moved to container level -->
+    <ItemTooltip
+      :item="hoveredItem"
+      :visible="hoveredItemId !== null"
+      :trigger-element="hoveredElement"
+    />
+
     </div>
 </template>
 
 <style scoped>
 .drops-view {
-  padding: 20px 200px;
+  padding: 2rem;
   width: 100%;
   max-width: none;
   margin: 0;
-  background-color: #1a1a1a;
+  background: transparent;
   color: #fff;
   min-height: 100vh;
   box-sizing: border-box;
+  position: relative;
 }
 
 /* Responsive padding */
@@ -418,38 +420,77 @@ watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
 
 h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 3rem;
+  color: rgba(203, 213, 225, 0.95);
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+h1::before {
+  content: '🐉';
+  font-size: 2rem;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+}
+
+h1::after {
+  content: '💎';
+  font-size: 2rem;
+  animation: bounce 2s infinite 0.5s;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 
 .filters {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
 .search-container {
   display: flex;
-  gap: 20px;
+  gap: 1.5rem;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  padding: 2rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .search-input {
-  padding: 10px 15px;
+  padding: 0.8rem 1.5rem;
   border-radius: 25px;
-  border: 2px solid #444;
-  background-color: #2a2a2a;
-  color: #fff;
-  font-size: 16px;
+  border: 2px solid rgba(71, 85, 105, 0.4);
+  background: rgba(30, 41, 59, 0.8);
+  color: rgba(203, 213, 225, 0.9);
+  font-size: 1rem;
   width: 250px;
   outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.search-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
 }
 
 .search-input:focus {
-  border-color: #ffd700;
+  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(51, 65, 85, 0.8);
+  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
 }
 
 .drops-container {
@@ -459,19 +500,54 @@ h1 {
 }
 
 .drop-item {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.drop-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
+  border-radius: 16px 16px 0 0;
+}
+
+.drop-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  border-color: rgba(148, 163, 184, 0.4);
 }
 
 .monster-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #ff6b6b;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #f87171;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.monster-name::before {
+  content: '👹';
+  font-size: 1.2rem;
+  animation: monsterFloat 3s ease-in-out infinite;
+}
+
+@keyframes monsterFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 .items-grid {
@@ -655,43 +731,46 @@ h1 {
 .item-icon {
   width: 32px;
   height: 32px;
-  border: 1px solid #555;
-  border-radius: 4px;
+  border: 2px solid rgba(71, 85, 105, 0.4);
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s;
-  background-color: #000;
+  transition: all 0.3s ease;
+  background-color: rgba(15, 23, 42, 0.8);
   flex-shrink: 0;
+  backdrop-filter: blur(5px);
 }
 
 .item-icon:hover {
-  border-color: #ffd700;
-  transform: scale(1.2);
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  border-color: rgba(168, 85, 247, 0.6);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(76, 29, 149, 0.5);
 }
 
 
 .equipment .item-icon {
-  border-color: #ff6b6b;
+  border-color: rgba(248, 113, 113, 0.6);
+  background-color: rgba(127, 29, 29, 0.2);
 }
 
 .equipment .item-icon:hover {
-  border-color: #ff4444;
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  border-color: rgba(248, 113, 113, 0.8);
+  box-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
 }
 
 .gift .item-icon {
-  border-color: #4ecdc4;
+  border-color: rgba(52, 211, 153, 0.6);
+  background-color: rgba(6, 78, 59, 0.2);
 }
 
 .gift .item-icon:hover {
-  border-color: #26a69a;
-  box-shadow: 0 0 8px rgba(78, 205, 196, 0.5);
+  border-color: rgba(52, 211, 153, 0.8);
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
 }
 
 .item-name-label {
   font-size: 11px;
-  color: #ccc;
+  color: rgba(203, 213, 225, 0.8);
   text-align: center;
   width: 100%;
   line-height: 1.3;
@@ -708,11 +787,11 @@ h1 {
 }
 
 .equipment .item-name-label {
-  color: #ff6b6b;
+  color: rgba(248, 113, 113, 0.9);
 }
 
 .gift .item-name-label {
-  color: #4ecdc4;
+  color: rgba(52, 211, 153, 0.9);
 }
 
 /* Infinite Scroll Trigger */
@@ -737,18 +816,26 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-top: 30px;
-  padding: 20px;
-  color: #ccc;
-  font-size: 16px;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding: 2rem;
+  color: rgba(203, 213, 225, 0.8);
+  font-size: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 300px;
 }
 
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #333;
-  border-top: 3px solid #ffd700;
+  border: 3px solid rgba(71, 85, 105, 0.3);
+  border-top: 3px solid #a855f7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -761,25 +848,92 @@ h1 {
 /* No Results */
 .no-results {
   text-align: center;
-  margin-top: 50px;
-  padding: 40px;
-  color: #888;
-  font-size: 18px;
+  margin-top: 3rem;
+  padding: 3rem;
+  color: rgba(203, 213, 225, 0.8);
+  font-size: 1.1rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-results::before {
+  content: '🔍';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
 }
 
 .no-results p {
-  margin: 5px 0;
+  margin: 0.5rem 0;
+  line-height: 1.6;
 }
 
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
+/* Mobile optimization */
+@media (max-width: 768px) {
   .drops-view {
-    background-color: #0f0f0f;
+    padding: 1rem;
+  }
+
+  .search-container {
+    padding: 1.5rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .search-input {
+    width: 100%;
+    max-width: 300px;
   }
 
   .drop-item {
-    background: linear-gradient(135deg, #1f1f1f 0%, #0f0f0f 100%);
+    padding: 1.5rem;
+  }
+
+  .monster-name {
+    font-size: 1.1rem;
+  }
+
+  .loading-indicator,
+  .no-results {
+    margin: 2rem 1rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drops-view {
+    padding: 0.5rem;
+  }
+
+  .search-container {
+    padding: 1rem;
+  }
+
+  .drop-item {
+    padding: 1rem;
+  }
+
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, 55px);
+    gap: 8px;
+  }
+
+  .item-wrapper {
+    width: 55px;
+    height: 61px;
+  }
+
+  .item-name-label {
+    font-size: 10px;
+    height: 24px;
   }
 }
 </style>
