@@ -92,26 +92,26 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 
       <div class="hero-content">
         <div class="hero-logo">
-          <h1 class="game-title">✨  美丽世界 N-Age ✨ </h1>
-          <div class="title-decoration">⚡ 💻 🏙️ ⚡</div>
+          <h1 class="game-title">✨  美丽世界 ✨ </h1>
+          <div class="title-decoration">N-Age</div>
         </div>
 
         <p class="hero-subtitle">欢迎来到未来都市的科技与冒险世界</p>
 
-        <div class="hero-features">
-          <div class="hero-feature">
-            <span class="feature-emoji">🌃</span>
-            <span>未来都市体验</span>
-          </div>
-          <div class="hero-feature">
-            <span class="feature-emoji">⚡</span>
-            <span>科技战斗系统</span>
-          </div>
-          <div class="hero-feature">
-            <span class="feature-emoji">🤖</span>
-            <span>智能AI交互</span>
-          </div>
-        </div>
+<!--        <div class="hero-features">-->
+<!--          <div class="hero-feature">-->
+<!--            <span class="feature-emoji">🌃</span>-->
+<!--            <span>未来都市体验</span>-->
+<!--          </div>-->
+<!--          <div class="hero-feature">-->
+<!--            <span class="feature-emoji">⚡</span>-->
+<!--            <span>科技战斗系统</span>-->
+<!--          </div>-->
+<!--          <div class="hero-feature">-->
+<!--            <span class="feature-emoji">🤖</span>-->
+<!--            <span>智能AI交互</span>-->
+<!--          </div>-->
+<!--        </div>-->
 
         <div class="hero-cta">
           <button class="game-button primary">开始冒险</button>
@@ -189,9 +189,9 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
     <!-- Footer Notice -->
     <footer class="footer-notice">
       <div class="notice-content game-card">
-        <div class="notice-icon">🌆</div>
+<!--        <div class="notice-icon">🌆</div>-->
         <p>{{ footerNotice }}</p>
-        <div class="notice-decoration">⚡ 🏙️ 💻 ⚡</div>
+<!--        <div class="notice-decoration">⚡ 🏙️ 💻 ⚡</div>-->
       </div>
     </footer>
   </div>
