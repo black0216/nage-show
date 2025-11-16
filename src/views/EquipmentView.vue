@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
 import type { EquipmentItem } from '../types'
 import { PART_MAP, CLASS_MAP } from '../types'
-import { CryptoUtils } from '../utils/crypto.utils'
+import { loadEquipData } from '../utils/protobuf.utils'
 
 // Global state for pagination
 let allEquipmentData: EquipmentItem[] = []
@@ -28,14 +28,7 @@ const loadAllData = async () => {
   if (allEquipmentData.length > 0) return // Already loaded
 
   try {
-    const response = await fetch('/Equip.json')
-    const encryptedData = await response.text()
-
-    // 解密数据
-    const decryptedData = CryptoUtils.AesDecrypt(encryptedData)
-    const allData = JSON.parse(decryptedData)
-
-    allEquipmentData = allData
+    allEquipmentData = await loadEquipData()
   } catch (error) {
     console.error('Failed to load all equipment data:', error)
   }

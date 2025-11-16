@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+option csharp_namespace = "Proto";
+
+// 技能
+message SkillMap {
+  int32 k = 1;
+  int32 v = 2;
+}
+
+// 装备模板
+message EquipTemplate {
+  int32 part = 1;
+  int32 for_char = 2;
+  int32 need_dex = 3;
+  int32 need_str = 4;
+  int32 need_esp = 5;
+  int32 need_spt = 6;
+  int32 need_int = 7;
+  int32 need_class = 8;
+  int32 need_brandish = 9;
+  int32 need_martial = 10;
+  int32 need_chakra = 11;
+  int32 need_prana = 12;
+  int32 need_dodge = 13;
+  int32 need_tactic = 14;
+  int32 dp = 15;
+  int32 ap = 16;
+  int32 add_str = 17;
+  int32 add_dex = 18;
+  int32 add_esp = 19;
+  int32 add_spt = 20;
+  int32 add_int = 21;
+  int32 add_martial = 22;
+  int32 add_brandish = 23;
+  int32 add_chakra = 24;
+  int32 add_prana = 25;
+  int32 add_dodge = 26;
+  int32 add_tactic = 27;
+  int32 add_hp = 28;
+  int32 add_ap = 29;
+  int32 add_dp = 30;
+  int32 add_sp = 31;
+  int32 add_st = 32;
+  int32 add_ms = 33;
+  int32 add_tactic_per = 34;
+  int32 add_dp_per = 35;
+  int32 add_ap_per = 36;
+  int32 need_hero = 37;
+  int32 add_as_per = 38;
+  bool att_spec_flag = 39;
+  int32 att_spec_ratio = 40;
+  int32 add_hp_per = 41;
+  int32 add_sp_per = 42;
+  repeated SkillMap add_skill = 43;
+}
+
+// 物品实体
+message ItemEntity {
+  int32 type = 1;
+  string name = 2;
+  string sheet = 3;
+  int32 x = 4;
+  int32 y = 5;
+  repeated string gifts = 6;
+  EquipTemplate equip = 7;
+}
+
+
+
+// 掉落实体
+message DropEntity {
+  string npc_name = 1;
+  repeated ItemEntity drop_items = 2;
+}
+
+// 制作实体
+message CraftingEntity {
+  ItemEntity item = 1;
+  ItemEntity item_a = 2;
+  ItemEntity item_b = 3;
+  ItemEntity item_c = 4;
+}
+
+// 掉落数据集合
+message DropData {
+  repeated DropEntity drops = 1;
+}
+
+// 制作数据集合
+message CraftingData {
+  repeated CraftingEntity crafting_items = 1;
+}
+
+// 装备数据集合
+message EquipData {
+  repeated ItemEntity equips = 1;
+}

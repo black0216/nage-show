@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
 import type { CraftingItem } from '@/types'
-import { CryptoUtils } from '../utils/crypto.utils'
+import { loadCraftingData } from '../utils/protobuf.utils'
 
 interface CraftingRecipe {
   Item: CraftingItem      // 最终道具
@@ -32,14 +32,7 @@ const loadAllData = async () => {
   if (allCraftingData.length > 0) return // Already loaded
 
   try {
-    const response = await fetch('/Crafting.json')
-    const encryptedData = await response.text()
-
-    // 解密数据
-    const decryptedData = CryptoUtils.AesDecrypt(encryptedData)
-    const allData = JSON.parse(decryptedData)
-
-    allCraftingData = allData
+    allCraftingData = await loadCraftingData()
   } catch (error) {
     console.error('Failed to load all crafting data:', error)
   }

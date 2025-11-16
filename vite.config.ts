@@ -14,11 +14,6 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    vueDevTools(),
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-    }),
     vitePluginBundleObfuscator({
       excludes: [],
       enable: true,

@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import ItemTooltip from '../components/ItemTooltip.vue'
 import type { DropItem } from '../types'
-import { CryptoUtils } from '../utils/crypto.utils'
+import { loadDropData } from '../utils/protobuf.utils'
 
 interface DropData {
   NpcName: string
@@ -31,14 +31,7 @@ const loadAllData = async () => {
   if (allDropsData.length > 0) return // Already loaded
 
   try {
-    const response = await fetch('/Drops.json')
-    const encryptedData = await response.text()
-
-    // 解密数据
-    const decryptedData = CryptoUtils.AesDecrypt(encryptedData)
-    const allData = JSON.parse(decryptedData)
-
-    allDropsData = allData
+    allDropsData = await loadDropData()
   } catch (error) {
     console.error('Failed to load all drops data:', error)
   }
