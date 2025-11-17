@@ -174,28 +174,39 @@ const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: stri
 
 // Handle touch start for mobile
 const handleTouchStart = (item: CraftingItem, recipeIndex: number, slotType: string, event: TouchEvent) => {
-  if (event.currentTarget) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const currentItemId = getItemId(item, recipeIndex, slotType)
+
+  if (hoveredItemId.value === currentItemId) {
+    // Same item tapped - hide tooltip
+    hoveredItem.value = null
+    hoveredItemId.value = null
+    hoveredElement.value = null
+  } else {
+    // Different item tapped - show new tooltip
     hoveredItem.value = item
-    hoveredItemId.value = getItemId(item, recipeIndex, slotType)
+    hoveredItemId.value = currentItemId
     hoveredElement.value = event.currentTarget as HTMLElement
   }
 }
 
-// Handle touch end for mobile
-const handleTouchEnd = (event: TouchEvent) => {
-  // Small delay to allow tooltip to be shown before hiding
-  setTimeout(() => {
-    hoveredItem.value = null
-    hoveredItemId.value = null
-    hoveredElement.value = null
-  }, 150)
-}
+// Global touch handler for hiding tooltips when touching outside
+const handleGlobalTouch = (event: TouchEvent) => {
+  // Check if touch is outside any item icon
+  const touch = event.touches[0]
+  if (touch) {
+    const element = document.elementFromPoint(touch.clientX, touch.clientY)
+    const isItemIcon = element?.closest('.item-icon')
 
-// Handle touch cancel for mobile
-const handleTouchCancel = () => {
-  hoveredItem.value = null
-  hoveredItemId.value = null
-  hoveredElement.value = null
+    if (!isItemIcon) {
+      // Touch outside item icons, hide tooltip
+      hoveredItem.value = null
+      hoveredItemId.value = null
+      hoveredElement.value = null
+    }
+  }
 }
 
 
@@ -206,6 +217,9 @@ onMounted(async () => {
 
   // Load initial page for display
   loadMoreCrafting(true)
+
+  // Add global touch listener to hide tooltips when touching outside
+  document.addEventListener('touchstart', handleGlobalTouch, { passive: true })
 
   // Setup intersection observer for infinite scroll
   setupInfiniteScroll()
@@ -233,11 +247,14 @@ const setupInfiniteScroll = () => {
 
   updateObserverTarget()
 
-  // Cleanup observer on unmount
+  // Cleanup observer and listeners on unmount
   onUnmounted(() => {
     if (infiniteObserver) {
       infiniteObserver.disconnect()
     }
+
+    // Remove global touch listener
+    document.removeEventListener('touchstart', handleGlobalTouch)
   })
 }
 
@@ -315,14 +332,14 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemA.Type === 3, 'gift': recipe.ItemA.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
-                  @touchstart="(event) => handleTouchStart(recipe.ItemA, index, 'A', event)"
-                  @touchend="handleTouchEnd"
-                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
                     :style="getIconStyle(recipe.ItemA.Sheet, recipe.ItemA.X, recipe.ItemA.Y)"
                     :alt="recipe.ItemA.Name"
+                    @click="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
+                    @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
+                    @touchstart="(event) => handleTouchStart(recipe.ItemA, index, 'A', event)"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemA.Name }}</div>
@@ -338,14 +355,14 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemB.Type === 3, 'gift': recipe.ItemB.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
-                  @touchstart="(event) => handleTouchStart(recipe.ItemB, index, 'B', event)"
-                  @touchend="handleTouchEnd"
-                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
                     :style="getIconStyle(recipe.ItemB.Sheet, recipe.ItemB.X, recipe.ItemB.Y)"
                     :alt="recipe.ItemB.Name"
+                    @click="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
+                    @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
+                    @touchstart="(event) => handleTouchStart(recipe.ItemB, index, 'B', event)"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemB.Name }}</div>
@@ -361,14 +378,14 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemC.Type === 3, 'gift': recipe.ItemC.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
-                  @touchstart="(event) => handleTouchStart(recipe.ItemC, index, 'C', event)"
-                  @touchend="handleTouchEnd"
-                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
                     :style="getIconStyle(recipe.ItemC.Sheet, recipe.ItemC.X, recipe.ItemC.Y)"
                     :alt="recipe.ItemC.Name"
+                    @click="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
+                    @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
+                    @touchstart="(event) => handleTouchStart(recipe.ItemC, index, 'C', event)"
                 >
                 </div>
                 <div class="item-name-label">{{ recipe.ItemC.Name }}</div>
@@ -392,14 +409,14 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 :class="{ 'equipment': recipe.Item.Type === 3, 'gift': recipe.Item.Type === 2 }"
                 @mouseenter="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
                 @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
-                @touchstart="(event) => handleTouchStart(recipe.Item, index, 'Final', event)"
-                @touchend="handleTouchEnd"
-                @touchcancel="handleTouchCancel"
             >
               <div
                   class="item-icon result-icon"
                   :style="getIconStyle(recipe.Item.Sheet, recipe.Item.X, recipe.Item.Y)"
                   :alt="recipe.Item.Name"
+                  @click="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
+                  @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
+                  @touchstart="(event) => handleTouchStart(recipe.Item, index, 'Final', event)"
               >
               </div>
               <div class="item-name-label">{{ recipe.Item.Name }}</div>
@@ -640,6 +657,8 @@ h1::after {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .item-icon {
@@ -650,6 +669,10 @@ h1::after {
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  pointer-events: auto;
   background-color: var(--muted);
   flex-shrink: 0;
 }

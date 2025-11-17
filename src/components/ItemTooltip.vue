@@ -281,7 +281,7 @@ const getStrDexIntRequirements = () => {
   if (equip.NeedDex > 0) stats.push(`DEX ${equip.NeedDex}`)
   if (equip.NeedInt > 0) stats.push(`INT ${equip.NeedInt}`)
 
-  return stats.join(',')
+  return stats.join(' ')
 }
 
 // AddEsp,AddSpt

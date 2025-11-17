@@ -226,8 +226,8 @@ const getItemId = (item: EquipmentItem, index?: number): string => {
   return baseId
 }
 
-// Handle item hover
-const handleItemHover = (item: EquipmentItem, index: number, isHovering: boolean, event?: MouseEvent) => {
+// Handle item hover (supports both mouse and touch events)
+const handleItemHover = (item: EquipmentItem, index: number, isHovering: boolean, event?: MouseEvent | TouchEvent) => {
   if (isHovering && event?.currentTarget) {
     hoveredItem.value = item
     hoveredItemId.value = getItemId(item, index)
@@ -239,6 +239,43 @@ const handleItemHover = (item: EquipmentItem, index: number, isHovering: boolean
   }
 }
 
+// Handle touch start for mobile
+const handleTouchStart = (item: EquipmentItem, index: number, event: TouchEvent) => {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const currentItemId = getItemId(item, index)
+
+  if (hoveredItemId.value === currentItemId) {
+    // Same item tapped - hide tooltip
+    hoveredItem.value = null
+    hoveredItemId.value = null
+    hoveredElement.value = null
+  } else {
+    // Different item tapped - show new tooltip
+    hoveredItem.value = item
+    hoveredItemId.value = currentItemId
+    hoveredElement.value = event.currentTarget as HTMLElement
+  }
+}
+
+// Global touch handler for hiding tooltips when touching outside
+const handleGlobalTouch = (event: TouchEvent) => {
+  // Check if touch is outside any item icon
+  const touch = event.touches[0]
+  if (touch) {
+    const element = document.elementFromPoint(touch.clientX, touch.clientY)
+    const isItemIcon = element?.closest('.item-icon')
+
+    if (!isItemIcon) {
+      // Touch outside item icons, hide tooltip
+      hoveredItem.value = null
+      hoveredItemId.value = null
+      hoveredElement.value = null
+    }
+  }
+}
+
 
 // Initialize component
 onMounted(async () => {
@@ -247,6 +284,9 @@ onMounted(async () => {
 
   // Load initial page for display
   loadMoreEquipment(true)
+
+  // Add global touch listener to hide tooltips when touching outside
+  document.addEventListener('touchstart', handleGlobalTouch, { passive: true })
 
   // Setup intersection observer for infinite scroll
   setupInfiniteScroll()
@@ -279,6 +319,9 @@ const setupInfiniteScroll = () => {
     if (infiniteObserver) {
       infiniteObserver.disconnect()
     }
+
+    // Remove global touch listener
+    document.removeEventListener('touchstart', handleGlobalTouch)
   })
 }
 
@@ -393,6 +436,9 @@ watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async (
             class="item-icon"
             :style="getIconStyle(item.Sheet, item.X, item.Y)"
             :alt="item.Name"
+            @click="(event) => handleItemHover(item, index, true, event)"
+            @mouseleave="(event) => handleItemHover(item, index, false, event)"
+            @touchstart="(event) => handleTouchStart(item, index, event)"
           >
           </div>
           <div class="item-name-label">{{ item.Name }}</div>
