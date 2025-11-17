@@ -159,8 +159,8 @@ const getItemId = (item: CraftingItem, recipeIndex?: number, slotType?: string):
   return baseId
 }
 
-// Handle item hover
-const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: string, isHovering: boolean, event?: MouseEvent) => {
+// Handle item hover (supports both mouse and touch events)
+const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: string, isHovering: boolean, event?: MouseEvent | TouchEvent) => {
   if (isHovering && event?.currentTarget) {
     hoveredItem.value = item
     hoveredItemId.value = getItemId(item, recipeIndex, slotType)
@@ -170,6 +170,32 @@ const handleItemHover = (item: CraftingItem, recipeIndex: number, slotType: stri
     hoveredItemId.value = null
     hoveredElement.value = null
   }
+}
+
+// Handle touch start for mobile
+const handleTouchStart = (item: CraftingItem, recipeIndex: number, slotType: string, event: TouchEvent) => {
+  if (event.currentTarget) {
+    hoveredItem.value = item
+    hoveredItemId.value = getItemId(item, recipeIndex, slotType)
+    hoveredElement.value = event.currentTarget as HTMLElement
+  }
+}
+
+// Handle touch end for mobile
+const handleTouchEnd = (event: TouchEvent) => {
+  // Small delay to allow tooltip to be shown before hiding
+  setTimeout(() => {
+    hoveredItem.value = null
+    hoveredItemId.value = null
+    hoveredElement.value = null
+  }, 150)
+}
+
+// Handle touch cancel for mobile
+const handleTouchCancel = () => {
+  hoveredItem.value = null
+  hoveredItemId.value = null
+  hoveredElement.value = null
 }
 
 
@@ -289,6 +315,9 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemA.Type === 3, 'gift': recipe.ItemA.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemA, index, 'A', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemA, index, 'A', false, event)"
+                  @touchstart="(event) => handleTouchStart(recipe.ItemA, index, 'A', event)"
+                  @touchend="handleTouchEnd"
+                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
@@ -309,6 +338,9 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemB.Type === 3, 'gift': recipe.ItemB.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemB, index, 'B', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemB, index, 'B', false, event)"
+                  @touchstart="(event) => handleTouchStart(recipe.ItemB, index, 'B', event)"
+                  @touchend="handleTouchEnd"
+                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
@@ -329,6 +361,9 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                   :class="{ 'equipment': recipe.ItemC.Type === 3, 'gift': recipe.ItemC.Type === 2 }"
                   @mouseenter="(event) => handleItemHover(recipe.ItemC, index, 'C', true, event)"
                   @mouseleave="(event) => handleItemHover(recipe.ItemC, index, 'C', false, event)"
+                  @touchstart="(event) => handleTouchStart(recipe.ItemC, index, 'C', event)"
+                  @touchend="handleTouchEnd"
+                  @touchcancel="handleTouchCancel"
               >
                 <div
                     class="item-icon"
@@ -357,6 +392,9 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
                 :class="{ 'equipment': recipe.Item.Type === 3, 'gift': recipe.Item.Type === 2 }"
                 @mouseenter="(event) => handleItemHover(recipe.Item, index, 'Final', true, event)"
                 @mouseleave="(event) => handleItemHover(recipe.Item, index, 'Final', false, event)"
+                @touchstart="(event) => handleTouchStart(recipe.Item, index, 'Final', event)"
+                @touchend="handleTouchEnd"
+                @touchcancel="handleTouchCancel"
             >
               <div
                   class="item-icon result-icon"
@@ -599,6 +637,9 @@ h1::after {
   width: 100px;
   height: 110px;
   justify-content: flex-start;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .item-icon {
