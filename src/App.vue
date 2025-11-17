@@ -1,6 +1,21 @@
 <script setup lang="ts">
-import { RouterView, RouterLink } from 'vue-router'
+import { RouterView, RouterLink, useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
 import BackToTop from './components/BackToTop.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
+
+const router = useRouter()
+const backToTopRef = ref<InstanceType<typeof BackToTop>>()
+
+// 监听路由变化，确保切换时回到顶部
+onMounted(() => {
+  router.afterEach(() => {
+    // 调用 BackToTop 组件的 scrollToTop 方法
+    if (backToTopRef.value) {
+      backToTopRef.value.scrollToTop()
+    }
+  })
+})
 </script>
 
 <template>
@@ -11,7 +26,6 @@ import BackToTop from './components/BackToTop.vue'
         <RouterLink to="/drops" class="nav-link" active-class="active">掉落表</RouterLink>
         <RouterLink to="/equipment" class="nav-link" active-class="active">装备表</RouterLink>
         <RouterLink to="/crafting" class="nav-link" active-class="active">合成表</RouterLink>
-        <RouterLink to="/ranking" class="nav-link" active-class="active">排行</RouterLink>
       </nav>
     </header>
 
@@ -20,7 +34,10 @@ import BackToTop from './components/BackToTop.vue'
     </main>
 
     <!-- Global Back to Top Button -->
-    <BackToTop />
+    <BackToTop ref="backToTopRef" />
+
+    <!-- Theme Toggle Button -->
+    <ThemeToggle />
   </div>
 </template>
 
@@ -33,10 +50,10 @@ import BackToTop from './components/BackToTop.vue'
 }
 
 .header {
-  background: rgba(30, 41, 59, 0.95);
+  background: var(--card);
   backdrop-filter: blur(25px);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
@@ -66,10 +83,10 @@ import BackToTop from './components/BackToTop.vue'
 
 
 .nav-link {
-  color: rgba(219, 234, 254, 0.9);
+  color: var(--card-foreground);
   text-decoration: none;
   padding: 0.8rem 1.5rem;
-  border-radius: 20px;
+  border-radius: var(--radius);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   font-weight: 600;
   font-size: 1rem;
@@ -77,7 +94,7 @@ import BackToTop from './components/BackToTop.vue'
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-  background: rgba(30, 41, 59, 0.6);
+  background: var(--muted);
   backdrop-filter: blur(8px);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
@@ -95,11 +112,11 @@ import BackToTop from './components/BackToTop.vue'
 
 .nav-link:hover {
   transform: translateY(-3px) scale(1.05);
-  color: white;
-  border-color: rgba(59, 130, 246, 0.5);
-  background: rgba(37, 99, 235, 0.4);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+  color: var(--foreground);
+  border-color: var(--primary);
+  background: var(--accent);
+  box-shadow: var(--shadow-xl);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .nav-link:hover::before {
@@ -107,12 +124,12 @@ import BackToTop from './components/BackToTop.vue'
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa);
-  color: white;
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
-  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .nav-link.active::after {
@@ -123,9 +140,9 @@ import BackToTop from './components/BackToTop.vue'
   transform: translateX(-50%);
   width: 30px;
   height: 3px;
-  background: linear-gradient(135deg, #60a5fa, #93c5fd);
+  background: var(--accent);
   border-radius: 2px;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  box-shadow: var(--shadow-md);
 }
 
 

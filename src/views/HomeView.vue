@@ -201,7 +201,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 .home-view {
   min-height: 100vh;
   background: transparent;
-  color: #fff;
+  color: var(--foreground);
   overflow-x: hidden;
   position: relative;
 }
@@ -222,14 +222,11 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg,
-    rgba(15, 23, 42, 0.95) 0%,
-    rgba(30, 41, 59, 0.95) 25%,
-    rgba(51, 65, 85, 0.95) 50%,
-    rgba(15, 23, 42, 0.95) 100%);
+  background: var(--background);
   background-size: 400% 400%;
   animation: gradientShift 20s ease infinite;
   z-index: 1;
+  opacity: 0.95;
 }
 
 .hero-background::before {
@@ -257,7 +254,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, transparent 0%, rgba(15, 23, 42, 0.6) 100%);
+  background: radial-gradient(circle at center, transparent 0%, color-mix(in srgb, var(--background) 60%, transparent) 100%);
   z-index: 2;
 }
 
@@ -288,14 +285,14 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   font-size: clamp(3rem, 8vw, 5rem);
   margin-bottom: 1rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff, #ffd700, #ff69b4, #00ffff);
+  background: linear-gradient(135deg, var(--foreground), var(--primary), var(--accent), var(--secondary));
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 60%, transparent));
   animation: titleGradient 3s ease-in-out infinite, titleGlow 2s ease-in-out infinite alternate;
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: var(--font-sans);
   letter-spacing: 2px;
 }
 
@@ -305,8 +302,8 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 }
 
 @keyframes titleGlow {
-  from { filter: brightness(1) drop-shadow(0 0 20px rgba(255, 215, 0, 0.5)); }
-  to { filter: brightness(1.2) drop-shadow(0 0 40px rgba(255, 215, 0, 0.8)); }
+  from { filter: brightness(1) drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 50%, transparent)); }
+  to { filter: brightness(1.2) drop-shadow(0 0 40px color-mix(in srgb, var(--primary) 80%, transparent)); }
 }
 
 .title-decoration {
@@ -323,11 +320,11 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 
 .hero-subtitle {
   font-size: clamp(1.2rem, 3vw, 1.6rem);
-  color: rgba(203, 213, 225, 0.9);
+  color: color-mix(in srgb, var(--muted-foreground) 90%, transparent);
   max-width: 800px;
   margin: 0 auto 3rem;
   line-height: 1.8;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 4px color-mix(in srgb, var(--background) 50%, transparent);
 }
 
 .hero-features {
@@ -343,20 +340,21 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   align-items: center;
   gap: 0.5rem;
   padding: 0.8rem 1.5rem;
-  background: rgba(30, 41, 59, 0.8);
+  background: color-mix(in srgb, var(--muted) 80%, transparent);
   backdrop-filter: blur(10px);
-  border-radius: 25px;
-  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
   transition: all 0.3s ease;
   font-weight: 500;
-  color: rgba(203, 213, 225, 0.9);
+  color: var(--muted-foreground);
 }
 
 .hero-feature:hover {
   transform: translateY(-2px);
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 8px 25px rgba(76, 29, 149, 0.3);
-  border-color: rgba(168, 85, 247, 0.4);
+  background: color-mix(in srgb, var(--accent) 80%, transparent);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+  color: var(--accent-foreground);
 }
 
 .feature-emoji {
@@ -371,29 +369,32 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 }
 
 .game-button.primary {
-  background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a855f7);
+  background: var(--primary);
   font-size: 1.1rem;
   padding: 1rem 2.5rem;
-  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  box-shadow: var(--shadow-lg);
+  color: var(--primary-foreground);
 }
 
 .game-button.primary:hover {
-  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.6);
+  box-shadow: var(--shadow-xl);
+  filter: brightness(1.1);
 }
 
 .game-button.secondary {
-  background: rgba(30, 41, 59, 0.8);
+  background: color-mix(in srgb, var(--muted) 80%, transparent);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(71, 85, 105, 0.4);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
   font-size: 1.1rem;
   padding: 1rem 2.5rem;
-  color: rgba(203, 213, 225, 0.9);
+  color: var(--muted-foreground);
 }
 
 .game-button.secondary:hover {
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 8px 25px rgba(76, 29, 149, 0.3);
-  border-color: rgba(168, 85, 247, 0.4);
+  background: color-mix(in srgb, var(--accent) 80%, transparent);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+  color: var(--accent-foreground);
 }
 
 /* Section Headers */
@@ -407,8 +408,8 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   margin-bottom: 1rem;
   font-weight: 700;
-  color: rgba(203, 213, 225, 0.95);
-  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  color: var(--foreground);
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 30%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -418,7 +419,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 .title-icon {
   font-size: 2rem;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 @keyframes bounce {
@@ -429,7 +430,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 
 .section-subtitle {
   font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--muted-foreground);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -438,7 +439,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 .server-features {
   padding: 4rem 2rem;
   position: relative;
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--background) 98%, transparent);
 }
 
 .server-features-container {
@@ -458,7 +459,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   flex-direction: column;
   min-height: 200px;
   animation: slideInUp 0.8s ease-out both;
-  border-radius: 20px;
+  border-radius: var(--radius);
 }
 
 @keyframes slideInUp {
@@ -477,14 +478,14 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
   top: 1.5rem;
   right: 1.5rem;
   padding: 0.6rem 1.2rem;
-  border-radius: 20px;
+  border-radius: var(--radius);
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-md);
   z-index: 2;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--background) 30%, transparent);
 }
 
 .feature-content {
@@ -527,14 +528,14 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 .server-feature-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  color: var(--card-foreground);
+  text-shadow: 0 2px 4px color-mix(in srgb, var(--background) 30%, transparent);
   line-height: 1.3;
   font-weight: 700;
 }
 
 .server-feature-card p {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-foreground);
   line-height: 1.6;
   font-size: 1rem;
   flex: 1;
@@ -544,7 +545,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 /* Characters Showcase Section */
 .characters-showcase {
   padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--background) 95%, transparent);
 }
 
 .characters-container {
@@ -583,12 +584,12 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 .character-item h4 {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--card-foreground);
   font-weight: 600;
 }
 
 .character-item p {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--muted-foreground);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -623,7 +624,7 @@ const footerNotice = "欢迎各位都市先锋提供宝贵建议，优秀建议�
 }
 
 .notice-content p {
-  color: white;
+  color: var(--card-foreground);
   font-size: 1.1rem;
   line-height: 1.6;
   margin: 0;

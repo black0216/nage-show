@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, defineExpose } from 'vue'
 
 const isVisible = ref(false)  // 初始不显示，滚动时才显示
 
-// Handle scroll events to show/hide button
-const handleScroll = () => {
-  const scrollY = window.scrollY || document.documentElement.scrollTop
-  isVisible.value = scrollY > 200  // 滚动超过200px时显示
-}
-
-// Scroll to top functionality
+// 暴露 scrollToTop 方法给父组件使用
 const scrollToTop = () => {
   console.log('BackToTop clicked') // Debug log
 
@@ -33,6 +27,17 @@ const scrollToTop = () => {
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
   }, 100)
+}
+
+// 暴露给父组件
+defineExpose({
+  scrollToTop
+})
+
+// Handle scroll events to show/hide button
+const handleScroll = () => {
+  const scrollY = window.scrollY || document.documentElement.scrollTop
+  isVisible.value = scrollY > 200  // 滚动超过200px时显示
 }
 
 // Initialize component

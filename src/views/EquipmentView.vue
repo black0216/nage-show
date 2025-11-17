@@ -443,7 +443,7 @@ watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async (
   max-width: none;
   margin: 0;
   background: transparent;
-  color: #fff;
+  color: var(--foreground);
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
@@ -465,8 +465,8 @@ watch(() => [searchTerm.value, selectedPart.value, selectedClass.value], async (
 h1 {
   text-align: center;
   margin-bottom: 3rem;
-  color: rgba(203, 213, 225, 0.95);
-  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  color: var(--foreground);
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 30%, transparent));
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 700;
   display: flex;
@@ -479,14 +479,14 @@ h1::before {
   content: '⚔️';
   font-size: 2rem;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 h1::after {
   content: '🛡️';
   font-size: 2rem;
   animation: bounce 2s infinite 0.5s;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 .filters {
@@ -497,11 +497,11 @@ h1::after {
   margin-bottom: 2rem;
   flex-wrap: wrap;
   padding: 2rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
 }
 
 .filter-group {
@@ -511,7 +511,7 @@ h1::after {
 }
 
 .filter-label {
-  color: rgba(203, 213, 225, 0.9);
+  color: var(--card-foreground);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -519,10 +519,10 @@ h1::after {
 .part-select,
 .class-select {
   padding: 0.8rem 1rem;
-  border-radius: 25px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
-  background: rgba(30, 41, 59, 0.8);
-  color: rgba(203, 213, 225, 0.9);
+  border-radius: var(--radius);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
+  background: var(--muted);
+  color: var(--muted-foreground);
   font-size: 0.9rem;
   outline: none;
   transition: all 0.3s ease;
@@ -533,23 +533,24 @@ h1::after {
 
 .part-select:focus,
 .class-select:focus {
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
+  border-color: var(--primary);
+  background: var(--accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--accent-foreground);
 }
 
 .part-select option,
 .class-select option {
-  background: rgba(15, 23, 42, 0.95);
-  color: rgba(203, 213, 225, 0.9);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .search-input {
   padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
-  background: rgba(30, 41, 59, 0.8);
-  color: rgba(203, 213, 225, 0.9);
+  border-radius: var(--radius);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
+  background: var(--muted);
+  color: var(--muted-foreground);
   font-size: 0.9rem;
   width: 250px;
   outline: none;
@@ -558,13 +559,14 @@ h1::after {
 }
 
 .search-input::placeholder {
-  color: rgba(148, 163, 184, 0.6);
+  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
 }
 
 .search-input:focus {
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
+  border-color: var(--primary);
+  background: var(--accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--accent-foreground);
 }
 
 .equipment-container {
@@ -574,11 +576,11 @@ h1::after {
   justify-content: center;
   width: 100%;
   padding: 2.5rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   margin: 0 auto;
   max-width: 1200px;
   position: relative;
@@ -592,8 +594,8 @@ h1::after {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
-  border-radius: 20px 20px 0 0;
+  background: var(--primary);
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .equipment-item {
@@ -617,29 +619,29 @@ h1::after {
 .item-icon {
   width: 32px;
   height: 32px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: rgba(15, 23, 42, 0.8);
+  background-color: var(--muted);
   flex-shrink: 0;
   backdrop-filter: blur(5px);
 }
 
 .item-icon:hover {
-  border-color: rgba(248, 113, 113, 0.8);
+  border-color: color-mix(in srgb, var(--destructive) 80%, transparent);
   transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--destructive) 50%, transparent);
 }
 
 .item-name-label {
   font-size: 11px;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   text-align: center;
   width: 100%;
   line-height: 1.3;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 2px color-mix(in srgb, var(--background) 80%, transparent);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -835,13 +837,13 @@ h1::after {
   gap: 1rem;
   margin-top: 3rem;
   padding: 2rem;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   font-size: 1rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   margin-left: auto;
   margin-right: auto;
   max-width: 300px;
@@ -850,8 +852,8 @@ h1::after {
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(71, 85, 105, 0.3);
-  border-top: 3px solid #a855f7;
+  border: 3px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -866,13 +868,13 @@ h1::after {
   text-align: center;
   margin-top: 3rem;
   padding: 3rem;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   font-size: 1.1rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;

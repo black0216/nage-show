@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-    <script type="module" crossorigin src="/assets/index-Bphul8mF.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-CCs5aZoR.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-DxdferXk.css">
+    <title>N-Age 游戏数据库</title>
+    <script>
+      // 主题预加载脚本，防止闪烁
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          // 默认使用深色模式
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-Ban26Pzp.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-C-Qazv_o.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CNL82_oi.css">
   </head>
   <body>
     <div id="app"></div>

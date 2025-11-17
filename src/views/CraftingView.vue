@@ -344,8 +344,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
         </div>
 
         <div class="crafting-arrow">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 8L32 20L20 32" stroke="#ffd700" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="arrow-svg">
+            <path d="M20 8L32 20L20 32" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
 
@@ -410,7 +410,7 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
   max-width: none;
   margin: 0;
   background: transparent;
-  color: #fff;
+  color: var(--foreground);
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
@@ -432,8 +432,8 @@ watch(() => searchTerm.value, async (newTerm, oldTerm) => {
 h1 {
   text-align: center;
   margin-bottom: 3rem;
-  color: rgba(203, 213, 225, 0.95);
-  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  color: var(--foreground);
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 30%, transparent));
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 700;
   display: flex;
@@ -446,14 +446,14 @@ h1::before {
   content: '⚗️';
   font-size: 2rem;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 h1::after {
   content: '🔨';
   font-size: 2rem;
   animation: bounce 2s infinite 0.5s;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 .filters {
@@ -463,10 +463,10 @@ h1::after {
 
 .search-input {
   padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
-  background: rgba(30, 41, 59, 0.8);
-  color: rgba(203, 213, 225, 0.9);
+  border-radius: var(--radius);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
+  background: var(--muted);
+  color: var(--muted-foreground);
   font-size: 1rem;
   width: 300px;
   outline: none;
@@ -475,13 +475,14 @@ h1::after {
 }
 
 .search-input::placeholder {
-  color: rgba(148, 163, 184, 0.6);
+  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
 }
 
 .search-input:focus {
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
+  border-color: var(--primary);
+  background: var(--accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--accent-foreground);
 }
 
 .crafting-container {
@@ -491,12 +492,12 @@ h1::after {
 }
 
 .crafting-item {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 2rem;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -513,22 +514,22 @@ h1::after {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
-  border-radius: 16px 16px 0 0;
+  background: var(--primary);
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .crafting-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary);
 }
 
 .section-title {
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: rgba(203, 213, 225, 0.95);
-  text-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+  color: var(--card-foreground);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 30%, transparent));
 }
 
 .materials-section {
@@ -554,15 +555,15 @@ h1::after {
   top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  color: #1a1a1a;
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-size: 10px;
   font-weight: bold;
   padding: 2px 6px;
   border-radius: 8px;
   z-index: 10;
   text-shadow: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .crafting-arrow {
@@ -571,6 +572,10 @@ h1::after {
   justify-content: center;
   flex-shrink: 0;
   margin: 0 10px;
+}
+
+.arrow-svg {
+  color: var(--primary);
 }
 
 .result-section {
@@ -599,58 +604,58 @@ h1::after {
 .item-icon {
   width: 32px;
   height: 32px;
-  border: 1px solid #555;
+  border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s;
-  background-color: #000;
+  background-color: var(--muted);
   flex-shrink: 0;
 }
 
 .result-icon {
   width: 48px;
   height: 48px;
-  border: 2px solid #ffd700;
+  border: 2px solid var(--primary);
   border-radius: 6px;
 }
 
 .item-icon:hover {
-  border-color: #ffd700;
+  border-color: var(--primary);
   transform: scale(1.2);
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 50%, transparent);
 }
 
 .result-icon:hover {
-  border-color: #ffed4e;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--primary) 60%, transparent);
 }
 
 .equipment .item-icon {
-  border-color: #ff6b6b;
+  border-color: color-mix(in srgb, var(--destructive) 60%, transparent);
 }
 
 .equipment .item-icon:hover {
-  border-color: #ff4444;
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  border-color: color-mix(in srgb, var(--destructive) 80%, transparent);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--destructive) 50%, transparent);
 }
 
 .gift .item-icon {
-  border-color: #4ecdc4;
+  border-color: color-mix(in srgb, #34d399 60%, transparent);
 }
 
 .gift .item-icon:hover {
-  border-color: #26a69a;
-  box-shadow: 0 0 8px rgba(78, 205, 196, 0.5);
+  border-color: color-mix(in srgb, #26a69a 80%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, #34d399 50%, transparent);
 }
 
 .item-name-label {
   font-size: 11px;
-  color: #ccc;
+  color: var(--muted-foreground);
   text-align: center;
   width: 100%;
   line-height: 1.3;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 2px color-mix(in srgb, var(--background) 80%, transparent);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -663,11 +668,11 @@ h1::after {
 }
 
 .equipment .item-name-label {
-  color: #ff6b6b;
+  color: color-mix(in srgb, var(--destructive) 90%, transparent);
 }
 
 .gift .item-name-label {
-  color: #4ecdc4;
+  color: color-mix(in srgb, #34d399 90%, transparent);
 }
 
 /* Infinite Scroll Trigger */
@@ -682,7 +687,7 @@ h1::after {
   text-align: center;
   margin-top: 30px;
   padding: 20px;
-  color: #666;
+  color: var(--muted-foreground);
   font-size: 14px;
   font-style: italic;
 }
@@ -695,15 +700,15 @@ h1::after {
   gap: 10px;
   margin-top: 30px;
   padding: 20px;
-  color: #ccc;
+  color: var(--muted-foreground);
   font-size: 16px;
 }
 
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #333;
-  border-top: 3px solid #ffd700;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -718,7 +723,7 @@ h1::after {
   text-align: center;
   margin-top: 50px;
   padding: 40px;
-  color: #888;
+  color: var(--muted-foreground);
   font-size: 18px;
 }
 
@@ -766,14 +771,4 @@ h1::after {
   }
 }
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .crafting-view {
-    background-color: #0f0f0f;
-  }
-
-  .crafting-item {
-    background: linear-gradient(135deg, #1f1f1f 0%, #0f0f0f 100%);
-  }
-}
 </style>

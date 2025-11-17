@@ -399,7 +399,7 @@ watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
   max-width: none;
   margin: 0;
   background: transparent;
-  color: #fff;
+  color: var(--foreground);
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
@@ -421,8 +421,8 @@ watch(() => itemSearchTerm.value, async (newTerm, oldTerm) => {
 h1 {
   text-align: center;
   margin-bottom: 3rem;
-  color: rgba(203, 213, 225, 0.95);
-  text-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  color: var(--foreground);
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--primary) 30%, transparent));
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 700;
   display: flex;
@@ -435,14 +435,14 @@ h1::before {
   content: '🐉';
   font-size: 2rem;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 h1::after {
   content: '💎';
   font-size: 2rem;
   animation: bounce 2s infinite 0.5s;
-  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 @keyframes bounce {
@@ -463,19 +463,19 @@ h1::after {
   align-items: center;
   flex-wrap: wrap;
   padding: 2rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
 }
 
 .search-input {
   padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
-  background: rgba(30, 41, 59, 0.8);
-  color: rgba(203, 213, 225, 0.9);
+  border-radius: var(--radius);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
+  background: var(--muted);
+  color: var(--muted-foreground);
   font-size: 1rem;
   width: 250px;
   outline: none;
@@ -484,13 +484,14 @@ h1::after {
 }
 
 .search-input::placeholder {
-  color: rgba(148, 163, 184, 0.6);
+  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
 }
 
 .search-input:focus {
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(51, 65, 85, 0.8);
-  box-shadow: 0 0 20px rgba(76, 29, 149, 0.3);
+  border-color: var(--primary);
+  background: var(--accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--accent-foreground);
 }
 
 .drops-container {
@@ -500,12 +501,12 @@ h1::after {
 }
 
 .drop-item {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 2rem;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -518,14 +519,14 @@ h1::after {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a855f7);
-  border-radius: 16px 16px 0 0;
+  background: var(--primary);
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .drop-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary);
 }
 
 .monster-name {
@@ -731,50 +732,50 @@ h1::after {
 .item-icon {
   width: 32px;
   height: 32px;
-  border: 2px solid rgba(71, 85, 105, 0.4);
+  border: 2px solid color-mix(in srgb, var(--border) 40%, transparent);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: rgba(15, 23, 42, 0.8);
+  background-color: var(--muted);
   flex-shrink: 0;
   backdrop-filter: blur(5px);
 }
 
 .item-icon:hover {
-  border-color: rgba(168, 85, 247, 0.6);
+  border-color: var(--primary);
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(76, 29, 149, 0.5);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--primary) 50%, transparent);
 }
 
 
 .equipment .item-icon {
-  border-color: rgba(248, 113, 113, 0.6);
-  background-color: rgba(127, 29, 29, 0.2);
+  border-color: color-mix(in srgb, var(--destructive) 60%, transparent);
+  background-color: color-mix(in srgb, var(--destructive) 20%, transparent);
 }
 
 .equipment .item-icon:hover {
-  border-color: rgba(248, 113, 113, 0.8);
-  box-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
+  border-color: color-mix(in srgb, var(--destructive) 80%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--destructive) 50%, transparent);
 }
 
 .gift .item-icon {
-  border-color: rgba(52, 211, 153, 0.6);
-  background-color: rgba(6, 78, 59, 0.2);
+  border-color: color-mix(in srgb, #34d399 60%, transparent);
+  background-color: color-mix(in srgb, #065f47 20%, transparent);
 }
 
 .gift .item-icon:hover {
-  border-color: rgba(52, 211, 153, 0.8);
-  box-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
+  border-color: color-mix(in srgb, #34d399 80%, transparent);
+  box-shadow: 0 0 15px color-mix(in srgb, #34d399 50%, transparent);
 }
 
 .item-name-label {
   font-size: 11px;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   text-align: center;
   width: 100%;
   line-height: 1.3;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 2px color-mix(in srgb, var(--background) 80%, transparent);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -787,11 +788,11 @@ h1::after {
 }
 
 .equipment .item-name-label {
-  color: rgba(248, 113, 113, 0.9);
+  color: color-mix(in srgb, var(--destructive) 90%, transparent);
 }
 
 .gift .item-name-label {
-  color: rgba(52, 211, 153, 0.9);
+  color: color-mix(in srgb, #34d399 90%, transparent);
 }
 
 /* Infinite Scroll Trigger */
@@ -819,13 +820,13 @@ h1::after {
   gap: 1rem;
   margin-top: 3rem;
   padding: 2rem;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   font-size: 1rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   margin-left: auto;
   margin-right: auto;
   max-width: 300px;
@@ -834,8 +835,8 @@ h1::after {
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(71, 85, 105, 0.3);
-  border-top: 3px solid #a855f7;
+  border: 3px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -850,13 +851,13 @@ h1::after {
   text-align: center;
   margin-top: 3rem;
   padding: 3rem;
-  color: rgba(203, 213, 225, 0.8);
+  color: var(--muted-foreground);
   font-size: 1.1rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;

@@ -2,6 +2,10 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHashHistory(),
+  scrollBehavior(to, from, savedPosition) {
+    // 始终回到顶部
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -23,12 +27,7 @@ const router = createRouter({
       name: 'crafting',
       component: () => import('../views/CraftingView.vue')
     },
-    {
-      path: '/ranking',
-      name: 'ranking',
-      component: () => import('../views/RankingView.vue')
-    },
-  ]
+    ]
 })
 
 
